@@ -26,10 +26,6 @@
       {
         "target": "nsis",
         "arch": ["x64"]
-      },
-      {
-        "target": "portable",
-        "arch": ["x64"]
       }
     ],
     "icon": "public/icon-512.png",
@@ -40,6 +36,9 @@
     "allowToChangeInstallationDirectory": true,
     "createDesktopShortcut": true,
     "createStartMenuShortcut": true,
-    "shortcutName": "Sirtoy Lending Plus"
+    "shortcutName": "Sirtoy Lending Plus",
+    "license": "license.txt",
+    "installerLanguages": ["en_US"],
+    "runAfterFinish": true
   }
 }
