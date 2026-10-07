@@ -16,6 +16,11 @@
     "description": "SIRTOY LENDING PLUS - Offline Desktop Lending Management System",
     "author": "Sirtoy Lending"
   },
+  "publish": [
+    {
+      "provider": "github"
+    }
+  ],
   "win": {
     "target": [
       {
