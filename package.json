@@ -1,7 +1,9 @@
 {
-  "name": "react-example",
+  "name": "sirtoy-lending-plus",
+  "description": "SIRTOY LENDING PLUS - Offline Desktop Lending Management System",
+  "author": "Sirtoy Lending",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite --port=3000 --host=0.0.0.0",
