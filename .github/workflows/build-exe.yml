@@ -30,8 +30,7 @@ jobs:
         run: npm install --save-dev electron@latest electron-builder@latest --legacy-peer-deps
 
       - name: Build Windows .EXE (Setup & Portable)
-        run: |
-          npx electron-builder --windows --config.win.target=nsis,portable --config.productName="Sirtoy Lending Plus" --config.appId="com.sirtoy.lendingplus" --config.directories.output="release" --config.files="dist/**/*,electron-main.cjs,public/**/*" --config.main="electron-main.cjs" -c.win.signAndEditExecutable=false
+        run: npx electron-builder --win --config electron-builder.json --publish never
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CSC_IDENTITY_AUTO_DISCOVERY: false
