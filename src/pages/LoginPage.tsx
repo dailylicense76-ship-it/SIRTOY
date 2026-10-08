@@ -17,7 +17,6 @@ import {
 import sirtoyMascot from '../assets/images/3d_mascot_logo_1791389838102.jpg';
 import sirtoyMascotFull from '../assets/images/sirtoy_mascot_logo_1791379374197.jpg';
 import sirtoyLogo from '../assets/images/sirtoy_logo_1791375971616.jpg';
-import { Footer } from '../components/Footer';
 
 export const LoginPage: React.FC = () => {
   const { db, login, setupInitialAdmin, openModal } = useApp();
@@ -416,9 +415,6 @@ export const LoginPage: React.FC = () => {
 
         </div>
       </main>
-
-      {/* Footer System Info */}
-      <Footer variant="dark" />
     </div>
   );
 };

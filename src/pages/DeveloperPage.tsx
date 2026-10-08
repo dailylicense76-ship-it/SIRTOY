@@ -351,7 +351,7 @@ Mga Hakbang sa Pag-activate:
 4. Pindutin ang "I-activate ang Product Key Now".
 
 Official Developer Facebook Support Page:
-https://www.facebook.com/profile.php?id=61595333360264
+https://www.facebook.com/profile.php?id=61595073996579
 
 Salamat sa pagtangkilik sa SIRTOY LENDING PLUS!`;
 
@@ -643,7 +643,7 @@ Salamat sa pagtangkilik sa SIRTOY LENDING PLUS!`;
                 Official Facebook page para sa mga katanungan, license verification, at updates.
               </p>
               <a
-                href="https://www.facebook.com/profile.php?id=61595333360264"
+                href="https://www.facebook.com/profile.php?id=61595073996579"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="mt-2 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs transition-colors cursor-pointer"

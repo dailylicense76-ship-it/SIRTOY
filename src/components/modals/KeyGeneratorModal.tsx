@@ -92,7 +92,7 @@ Instructions:
 3. Paste the Product Activation Key above and check the EULA agreement
 4. Click "I-activate ang Product Key Now"
 
-Developer Support Page: https://www.facebook.com/profile.php?id=61595333360264
+Developer Support Page: https://www.facebook.com/profile.php?id=61595073996579
 Thank you for choosing SIRTOY LENDING PLUS!`;
 
   const handleCopyMessage = () => {

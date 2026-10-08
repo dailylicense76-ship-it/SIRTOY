@@ -13,6 +13,7 @@ export interface LicenseInfo {
   statusMessage: string;
   isTrial: boolean;
   isExpired: boolean;
+  daysLeft?: number;
 }
 
 export interface EulaAcceptance {
@@ -25,8 +26,40 @@ export interface EulaAcceptance {
 const STORAGE_LICENSE_KEY = 'sirtoy_product_license_v2';
 const STORAGE_EULA_KEY = 'sirtoy_eula_accepted_v2';
 const STORAGE_DEVICE_UUID = 'sirtoy_machine_uuid_v2';
+const STORAGE_INSTALL_DATE = 'sirtoy_install_date_v2';
 const MASTER_SECRET = 'SIRTOY_MICROFINANCE_MASTER_SECRET_2026_PROD';
 const STORAGE_USED_KEYS = 'sirtoy_used_keys_list_v3';
+export const TRIAL_DURATION_DAYS = 7;
+
+export const getTrialStatus = (): {
+  isTrial: boolean;
+  isExpired: boolean;
+  daysRemaining: number;
+  installDate: string;
+  expiresAt: string;
+} => {
+  let installDate = safeStorage.get(STORAGE_INSTALL_DATE);
+  if (!installDate) {
+    installDate = new Date().toISOString();
+    safeStorage.set(STORAGE_INSTALL_DATE, installDate);
+  }
+
+  const installTime = new Date(installDate).getTime();
+  const now = Date.now();
+  const trialDurationMs = TRIAL_DURATION_DAYS * 24 * 60 * 60 * 1000;
+  const expiryTime = installTime + trialDurationMs;
+  const remainingMs = expiryTime - now;
+  const daysRemaining = Math.max(0, Math.ceil(remainingMs / (1000 * 60 * 60 * 24)));
+  const expiresAt = new Date(expiryTime).toISOString().slice(0, 10);
+
+  return {
+    isTrial: true,
+    isExpired: remainingMs <= 0,
+    daysRemaining,
+    installDate,
+    expiresAt
+  };
+};
 
 /**
  * Advanced Time-Spoofing & Date Rollback Detection Engine
@@ -224,7 +257,36 @@ export const validateProductKey = (key: string, currentMID: string): LicenseInfo
   }
 
   if (!cleanKey || !cleanKey.startsWith('SIR-')) {
-    return defaultInvalid;
+    const trial = getTrialStatus();
+    if (!trial.isExpired && trial.daysRemaining > 0) {
+      return {
+        productKey: '',
+        clientName: 'Company (7-Day Free Trial)',
+        machineId: currentMID,
+        licenseType: 'Trial',
+        issuedAt: trial.installDate,
+        expiresAt: trial.expiresAt,
+        isValid: true,
+        statusMessage: `✨ 7-Day Free Trial Active (${trial.daysRemaining} araw ang natitira bago mag-lock).`,
+        isTrial: true,
+        isExpired: false,
+        daysLeft: trial.daysRemaining
+      };
+    }
+
+    return {
+      productKey: '',
+      clientName: 'Trial Expired (Unregistered)',
+      machineId: currentMID,
+      licenseType: 'Trial',
+      issuedAt: trial.installDate,
+      expiresAt: trial.expiresAt,
+      isValid: false,
+      statusMessage: `⚠️ Nag-expire na ang inyong 7-Day Free Trial noong ${trial.expiresAt}. Mangyaring ipasok ang inyong Product Activation Key para ma-unlock ang system.`,
+      isTrial: true,
+      isExpired: true,
+      daysLeft: 0
+    };
   }
 
   // Check if it's already used on another occasion (Single-Use check)
@@ -455,7 +517,7 @@ c) Perform routine end-of-day cash reconciliations to verify physical cash on ha
       heading: '5. OFFICIAL DEVELOPER SUPPORT & CONTACT INQUIRIES',
       body: `For official commercial license purchasing, key re-issuance, custom feature requests, or technical support, contact the official system developer directly via:
 
-Developer Facebook Page: https://www.facebook.com/profile.php?id=61595333360264
+Developer Facebook Page: https://www.facebook.com/profile.php?id=61595073996579
 Email / Account: dailylicense76@gmail.com`
     }
   ]

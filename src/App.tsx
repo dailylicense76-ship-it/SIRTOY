@@ -3,7 +3,6 @@ import { AppProvider, useApp } from './context/AppContext';
 import { Sidebar } from './components/Sidebar';
 import { Header } from './components/Header';
 import { Toast } from './components/Toast';
-import { Footer } from './components/Footer';
 
 import { LoginPage } from './pages/LoginPage';
 import { DashboardPage } from './pages/DashboardPage';
@@ -174,14 +173,18 @@ const AppContent: React.FC = () => {
             </p>
             {signal === 'Terminated' ? (
               <p className="text-rose-200">
-                Ang lisensya para sa lending software na ito ay **tinapos o tinanggal na ng Developer**. Ito ay dulot ng paglabag sa software contract, pagtapos ng pinagkasunduang panahon, o hindi pagbabayad ng lisensya. Makipag-ugnayan sa facebook.com/profile.php?id=61595333360264 upang muling buksan ang serbisyo.
+                Ang lisensya para sa lending software na ito ay **tinapos o tinanggal na ng Developer**. Ito ay dulot ng paglabag sa software contract, pagtapos ng pinagkasunduang panahon, o hindi pagbabayad ng lisensya. Makipag-ugnayan sa facebook.com/profile.php?id=61595073996579 upang muling buksan ang serbisyo.
               </p>
             ) : signal === 'Paused' ? (
               <p className="text-amber-200">
                 Ang inyong system access ay **pansamantalang sinuspinde o naka-pause ng Developer**. Mangyaring makipag-ugnayan sa inyong reseller o Developer upang i-resume ang lisensya ng inyong kumpanya.
               </p>
             ) : (
-              <p>Naka-lock ang system para sa kaligtasan ng kumpanya at software. Hindi mo magagamit ang kabuuang system (borrowers directory, loans ledger, collections) kung walang valid na activation key.</p>
+              <p>
+                {licenseState.isExpired && licenseState.isTrial
+                  ? 'Tapos na ang inyong 7-Day Free Trial. Ipasok ang inyong official Product Activation Key para ma-unlock ang inyong directory, loans ledger, at collections.'
+                  : 'Naka-lock ang system para sa kaligtasan ng kumpanya at software. Hindi mo magagamit ang kabuuang system (borrowers directory, loans ledger, collections) kung walang valid na activation key.'}
+              </p>
             )}
           </div>
 
@@ -281,7 +284,7 @@ const AppContent: React.FC = () => {
               <div className="font-extrabold text-white">SIRTOY Lending Software Support</div>
             </div>
             <a
-              href="https://www.facebook.com/profile.php?id=61595333360264"
+              href="https://www.facebook.com/profile.php?id=61595073996579"
               target="_blank"
               rel="noopener noreferrer"
               className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-black text-xs flex items-center gap-1.5 shadow-md cursor-pointer transition-colors"
@@ -322,8 +325,6 @@ const AppContent: React.FC = () => {
           {activePage === 'settings' && <SettingsPage />}
           {activePage === 'audit' && <AuditPage />}
         </main>
-
-        <Footer variant="light" />
       </div>
 
       {/* Global Modals - Freshly mounted on open to guarantee clean state */}

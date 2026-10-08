@@ -67,18 +67,26 @@ export const Header: React.FC = () => {
           onClick={() => openModal('activationModal')}
           className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all border shadow-sm ${
             license.isValid
-              ? 'bg-emerald-50 border-emerald-300 text-emerald-900 hover:bg-emerald-100'
-              : 'bg-amber-50 border-amber-300 text-amber-900 hover:bg-amber-100'
+              ? license.isTrial
+                ? 'bg-amber-50 border-amber-300 text-amber-900 hover:bg-amber-100'
+                : 'bg-emerald-50 border-emerald-300 text-emerald-900 hover:bg-emerald-100'
+              : 'bg-rose-50 border-rose-300 text-rose-900 hover:bg-rose-100'
           }`}
           title="Click to view license status or enter activation product key"
         >
-          {license.isValid ? (
+          {license.isTrial ? (
+            <Key className="w-3.5 h-3.5 text-amber-600 flex-none" />
+          ) : license.isValid ? (
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 flex-none" />
           ) : (
-            <Key className="w-3.5 h-3.5 text-amber-600 flex-none" />
+            <Key className="w-3.5 h-3.5 text-rose-600 flex-none" />
           )}
           <span className="hidden sm:inline">
-            {license.isValid ? `License: ${license.licenseType}` : 'Activate License'}
+            {license.isTrial
+              ? `7-Day Trial (${license.daysLeft ?? 0}d left)`
+              : license.isValid
+              ? `License: ${license.licenseType}`
+              : 'Activate License'}
           </span>
         </button>
 

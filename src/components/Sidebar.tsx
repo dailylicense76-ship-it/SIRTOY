@@ -354,7 +354,7 @@ export const Sidebar: React.FC = () => {
 
           {/* Developer Contact Link */}
           <a
-            href="https://www.facebook.com/profile.php?id=61595333360264"
+            href="https://www.facebook.com/profile.php?id=61595073996579"
             target="_blank"
             rel="noopener noreferrer"
             className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold bg-blue-600 hover:bg-blue-500 text-white shadow-md hover:shadow-blue-500/20 border border-blue-400/40 transition-all group"
