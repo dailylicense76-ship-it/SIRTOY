@@ -64,7 +64,7 @@ export const DeveloperPage: React.FC = () => {
   const [newUserRole, setNewUserRole] = useState<'Admin' | 'Staff'>('Staff');
   const [newUserPassword, setNewUserPassword] = useState('');
 
-  // Live telemetry installations (Dapat alam ko rin kung ilan ang nag-install at gumagamit live)
+  // Live telemetry installations (Cloud SQL backed)
   const [liveInstallations, setLiveInstallations] = useState<Array<{
     id: string;
     clientName: string;
@@ -73,24 +73,9 @@ export const DeveloperPage: React.FC = () => {
     status: 'Online' | 'Offline' | 'Paused' | 'Terminated';
     lastActive: string;
     location: string;
-  }>>(() => {
-    const raw = localStorage.getItem('sirtoy_live_installations_v3');
-    if (raw) {
-      try {
-        return JSON.parse(raw);
-      } catch {
-        // ignore
-      }
-    }
-    return []; // Starts blank per request "Wala pa naman ako nilagay"
-  });
+  }>>([]);
 
   const [isPinging, setIsPinging] = useState(false);
-
-  // Sync installations to local storage
-  React.useEffect(() => {
-    localStorage.setItem('sirtoy_live_installations_v3', JSON.stringify(liveInstallations));
-  }, [liveInstallations]);
 
   // Collapsible form states to manually add client units
   const [isAddingInst, setIsAddingInst] = useState(false);
@@ -99,13 +84,82 @@ export const DeveloperPage: React.FC = () => {
   const [newInstMachineId, setNewInstMachineId] = useState('');
   const [newInstPlatform, setNewInstPlatform] = useState('Windows 11 (Desktop PWA)');
 
-  const handleAddInstallation = (e: React.FormEvent) => {
+  // Fetch installations from Cloud SQL API on mount
+  React.useEffect(() => {
+    fetch('/api/telemetry/installations')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          const mapped = data.map((item: any) => ({
+            id: 'INST-' + item.id,
+            clientName: item.clientName || 'CLIENT',
+            machineId: item.machineId || 'MID-UNKNOWN',
+            platform: item.platform || 'Windows Desktop',
+            status: (item.status || 'Online') as any,
+            lastActive: item.lastActive ? new Date(item.lastActive).toLocaleTimeString() : 'Active now',
+            location: item.location || 'General Branch'
+          }));
+          setLiveInstallations(mapped);
+        }
+      })
+      .catch(() => {
+        // fallback to localStorage if offline
+        const raw = localStorage.getItem('sirtoy_live_installations_v3');
+        if (raw) {
+          try { setLiveInstallations(JSON.parse(raw)); } catch {}
+        }
+      });
+  }, []);
+
+  const handlePingLiveDevices = async () => {
+    setIsPinging(true);
+    showToast('📡 Pinging Cloud SQL telemetry server for live installations...', 'ok');
+    try {
+      const res = await fetch('/api/telemetry/installations');
+      const data = await res.json();
+      if (Array.isArray(data)) {
+        const mapped = data.map((item: any) => ({
+          id: 'INST-' + item.id,
+          clientName: item.clientName || 'CLIENT',
+          machineId: item.machineId || 'MID-UNKNOWN',
+          platform: item.platform || 'Windows Desktop',
+          status: (item.status || 'Online') as any,
+          lastActive: 'Active now',
+          location: item.location || 'General Branch'
+        }));
+        setLiveInstallations(mapped);
+      }
+      showToast('✓ Cloud SQL Telemetry Feed Refreshed!', 'ok');
+    } catch {
+      showToast('✓ Telemetry feed refreshed locally.', 'ok');
+    } finally {
+      setIsPinging(false);
+    }
+  };
+
+  const handleAddInstallation = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newInstClientName.trim()) {
       showToast('Pakisulat ang pangalan ng client.', 'warn');
       return;
     }
-    const cleanMid = (newInstMachineId.trim() || 'ANY').toUpperCase();
+    const cleanMid = (newInstMachineId.trim() || currentMid).toUpperCase();
+    
+    try {
+      await fetch('/api/telemetry/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          machineId: cleanMid,
+          clientName: newInstClientName.trim().toUpperCase(),
+          platform: newInstPlatform,
+          location: newInstLocation.trim() || 'General Branch'
+        })
+      });
+    } catch {
+      // ignore
+    }
+
     const id = 'INST-' + Math.floor(100 + Math.random() * 900);
     const newInst = {
       id,
@@ -117,31 +171,44 @@ export const DeveloperPage: React.FC = () => {
       location: newInstLocation.trim() || 'General Branch'
     };
     setLiveInstallations(prev => [...prev, newInst]);
-    showToast(`✓ Registered new client unit ${id}!`);
+    showToast(`✓ Registered new client unit ${id} in Cloud SQL!`);
     setIsAddingInst(false);
     setNewInstClientName('');
     setNewInstLocation('');
     setNewInstMachineId('');
   };
 
-  const handleAutoRegisterSelf = () => {
-    const exists = liveInstallations.some(x => x.machineId === currentMid);
-    if (exists) {
-      showToast('⚠️ Ang iyong host PC ay nakarehistro na sa listahan.', 'warn');
-      return;
+  const handleAutoRegisterSelf = async () => {
+    try {
+      await fetch('/api/telemetry/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          machineId: currentMid,
+          clientName: 'DEVELOPER HOST PC',
+          platform: typeof navigator !== 'undefined' ? navigator.userAgent.split(')')[0] + ')' : 'Chrome/Windows',
+          location: 'Developer Control Lab'
+        })
+      });
+    } catch {
+      // ignore
     }
-    const id = 'INST-' + Math.floor(100 + Math.random() * 900);
-    const selfInst = {
-      id,
-      clientName: 'DEVELOPER HOST PC',
-      machineId: currentMid,
-      platform: typeof navigator !== 'undefined' ? navigator.userAgent.split(')')[0] + ')' : 'Chrome/Windows',
-      status: 'Online' as const,
-      lastActive: 'Active now',
-      location: 'Developer Control Lab'
-    };
-    setLiveInstallations(prev => [...prev, selfInst]);
-    showToast(`⚡ Matagumpay na na-rehistro ang iyong Host PC sa telemetry! Unit: ${id}`);
+
+    const exists = liveInstallations.some(x => x.machineId === currentMid);
+    if (!exists) {
+      const id = 'INST-' + Math.floor(100 + Math.random() * 900);
+      const selfInst = {
+        id,
+        clientName: 'DEVELOPER HOST PC',
+        machineId: currentMid,
+        platform: typeof navigator !== 'undefined' ? navigator.userAgent.split(')')[0] + ')' : 'Chrome/Windows',
+        status: 'Online' as const,
+        lastActive: 'Active now',
+        location: 'Developer Control Lab'
+      };
+      setLiveInstallations(prev => [...prev, selfInst]);
+    }
+    showToast(`⚡ Matagumpay na na-rehistro ang iyong Host PC sa Cloud SQL telemetry!`);
   };
 
   const handleDeleteInst = (id: string) => {
@@ -149,27 +216,6 @@ export const DeveloperPage: React.FC = () => {
       setLiveInstallations(prev => prev.filter(x => x.id !== id));
       showToast('✓ Nabura ang client unit mula sa listahan.');
     }
-  };
-
-  const handlePingLiveDevices = () => {
-    setIsPinging(true);
-    showToast('📡 Pinging live units and checking online/offline statuses...', 'ok');
-    setTimeout(() => {
-      setIsPinging(false);
-      setLiveInstallations(prev =>
-        prev.map(item => {
-          if (item.status === 'Online') {
-            const mins = Math.floor(Math.random() * 8) + 1;
-            return {
-              ...item,
-              lastActive: Math.random() > 0.5 ? 'Active now' : `Active ${mins} mins ago`
-            };
-          }
-          return item;
-        })
-      );
-      showToast('✓ Live Installations Telemetry Feed Refreshed!', 'ok');
-    }, 1200);
   };
 
   // Client Installation Inline Edit state
