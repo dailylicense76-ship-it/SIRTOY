@@ -46,7 +46,7 @@ export const SettingsPage: React.FC = () => {
   const [confirmPass, setConfirmPass] = useState('');
 
   // Company and Penalty State
-  const [companyName, setCompanyName] = useState(db.settings.company || 'SIRTOY LENDING PLUS, INC.');
+  const [companyName, setCompanyName] = useState(db.settings.company || 'LOAN MANAGEMENT SYSTEM, INC.');
   const [logoPreview, setLogoPreview] = useState(db.settings.logoUrl || '/logo.png');
   const [penaltyType, setPenaltyType] = useState<'Flat' | 'Percentage'>(db.settings.penaltyType || 'Flat');
   const [penaltyRate, setPenaltyRate] = useState<string>(String(db.settings.penaltyRate ?? 50));
@@ -93,7 +93,7 @@ export const SettingsPage: React.FC = () => {
             </div>
             <div>
               <h2 className="text-base font-black text-white">Local PC Folder Database Control Center</h2>
-              <p className="text-xs text-slate-300">Use any local folder on your Windows/Mac PC (e.g. <code className="bg-slate-800 px-1.5 py-0.5 rounded text-amber-300 font-mono">C:\SIRTOY_DATABASE</code>) as your live database storage.</p>
+              <p className="text-xs text-slate-300">Use any local folder on your Windows/Mac PC (e.g. <code className="bg-slate-800 px-1.5 py-0.5 rounded text-amber-300 font-mono">C:\LENDING_DATABASE</code>) as your live database storage.</p>
             </div>
           </div>
 

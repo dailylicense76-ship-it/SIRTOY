@@ -1519,7 +1519,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     const blob = new Blob([JSON.stringify(db, null, 2)], { type: 'application/json' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = `sirtoy-lending-backup-${today()}.json`;
+    a.download = `loan-management-system-backup-${today()}.json`;
     a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 1000);
   };
@@ -1573,7 +1573,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   ) => {
     updateDB(prev => {
       const next = { ...prev };
-      next.settings.company = company || 'SIRTOY LENDING PLUS, INC.';
+      next.settings.company = company || 'LENDING MANAGEMENT SYSTEM, INC.';
       if (logoUrl !== undefined) {
         next.settings.logoUrl = logoUrl;
       }
@@ -1596,7 +1596,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     const cleanDB: Database = {
       version: 10,
       settings: {
-        company: db.settings.company || 'SIRTOY LENDING PLUS, INC.',
+        company: db.settings.company || 'LENDING MANAGEMENT SYSTEM, INC.',
         logoUrl: db.settings.logoUrl,
         diskFolderName: db.settings.diskFolderName || '',
         diskFolderConfigured: db.settings.diskFolderConfigured || false,

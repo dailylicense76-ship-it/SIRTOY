@@ -1,5 +1,5 @@
 {
-  "name": "Remix SIRTOY LENDING PLUS — Offline Desktop Lending System",
+  "name": "Lending Management System — Offline Desktop Edition",
   "description": "Comprehensive offline desktop lending management system featuring loan schedule calculation (Flat, Standard Amortization, Diminishing), collection tracking, capital management, expense tracking, collector quota monitoring, cash reconciliation, and automated SOAs.",
   "requestFramePermissions": [],
   "majorCapabilities": [

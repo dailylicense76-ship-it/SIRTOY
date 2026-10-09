@@ -45,7 +45,7 @@ export function seed(): Database {
   return {
     version: 10,
     settings: {
-      company: 'SIRTOY LENDING PLUS, INC.',
+      company: 'LENDING MANAGEMENT SYSTEM, INC.',
       logoUrl: defaultLogo,
       diskFolderName: '',
       diskFolderConfigured: false,

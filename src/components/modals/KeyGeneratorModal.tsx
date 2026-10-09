@@ -76,7 +76,7 @@ export const KeyGeneratorModal: React.FC = () => {
     setTimeout(() => setCopiedKey(false), 2500);
   };
 
-  const salesMessageTemplate = ` Good day! Attached is your Official Product Activation Key for SIRTOY LENDING PLUS SOFTWARE.
+  const salesMessageTemplate = ` Good day! Attached is your Official Product Activation Key for LOAN MANAGEMENT SYSTEM SOFTWARE.
 
 Client/Business: ${clientName.toUpperCase()}
 License Type: ${licenseType.toUpperCase()}
@@ -87,13 +87,13 @@ Expiry: ${licenseType === 'Perpetual' ? 'Lifetime Perpetual (No Expiration)' : e
 ${generatedKey}
 
 Instructions:
-1. Open SIRTOY Lending Software
+1. Open Loan Management System Software
 2. Click "Software License" or Activation Banner
 3. Paste the Product Activation Key above and check the EULA agreement
 4. Click "I-activate ang Product Key Now"
 
 Developer Support Page: https://www.facebook.com/profile.php?id=61595073996579
-Thank you for choosing SIRTOY LENDING PLUS!`;
+Thank you for choosing LOAN MANAGEMENT SYSTEM!`;
 
   const handleCopyMessage = () => {
     navigator.clipboard.writeText(salesMessageTemplate);
@@ -241,7 +241,7 @@ Thank you for choosing SIRTOY LENDING PLUS!`;
                   value={clientName}
                   onChange={e => setClientName(e.target.value.toUpperCase())}
                   className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-black text-slate-900 bg-white uppercase"
-                  placeholder="e.g. SIRTOY LENDING INC"
+                  placeholder="e.g. LOAN MANAGEMENT INC"
                 />
               </div>
 

@@ -9,7 +9,7 @@ function createWindow() {
     height: 860,
     minWidth: 1024,
     minHeight: 700,
-    title: 'SIRTOY LENDING PLUS — Offline Desktop System',
+    title: 'Lending Management System — Offline Desktop System',
     icon: path.join(__dirname, 'public', 'icon-512.png'),
     webPreferences: {
       nodeIntegration: false,
@@ -47,7 +47,7 @@ function checkForAutoUpdates() {
       dialog.showMessageBox(mainWindow, {
         type: 'info',
         title: 'May Bagong Update!',
-        message: `May bagong bersyon (${info.version}) ng SIRTOY Lending Plus na na-download na.`,
+        message: `May bagong bersyon (${info.version}) ng Loan Management System na na-download na.`,
         detail: 'I-restart ang application ngayon para magamit ang pinakabagong update.',
         buttons: ['I-restart Ngayon', 'Mamaya'],
         defaultId: 0,

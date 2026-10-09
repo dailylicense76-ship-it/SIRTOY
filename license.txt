@@ -1,9 +1,9 @@
 END USER LICENSE AGREEMENT (EULA) & TERMS OF USE
-SIRTOY LENDING PLUS — OFFLINE DESKTOP LENDING MANAGEMENT SYSTEM
-Copyright © 2026 Sirtoy Lending. All rights reserved.
+LOAN MANAGEMENT SYSTEM — OFFLINE DESKTOP LENDING MANAGEMENT SYSTEM
+Copyright © 2026 Lending Management System. All rights reserved.
 
 IMPORTANT - PLEASE READ CAREFULLY BEFORE INSTALLING:
-This End User License Agreement ("Agreement") is a legal agreement between you ("Licensee" or "User") and the Developer for the software product "SIRTOY LENDING PLUS" ("Software"), which includes computer software, database engines, 3D interface assets, and associated offline tools.
+This End User License Agreement ("Agreement") is a legal agreement between you ("Licensee" or "User") and the Developer for the software product "LOAN MANAGEMENT SYSTEM" ("Software"), which includes computer software, database engines, 3D interface assets, and associated offline tools.
 
 1. GRANT OF LICENSE
 The Developer grants you a non-exclusive, non-transferable license to install and execute this Software on authorized computer hardware bound to the verified Machine ID (MID) and official Product Key.

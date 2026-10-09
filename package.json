@@ -1,7 +1,7 @@
 {
   "name": "sirtoy-lending-plus",
-  "description": "SIRTOY LENDING PLUS - Offline Desktop Lending Management System",
-  "author": "Sirtoy Lending",
+  "description": "LOAN MANAGEMENT SYSTEM - Offline Desktop Lending Management System",
+  "author": "Loan Management System",
   "private": true,
   "version": "1.0.0",
   "type": "module",

@@ -94,7 +94,7 @@ export const ActivationModal: React.FC = () => {
                 Software License Activation
               </h2>
               <span className="text-[10px] text-slate-300 font-semibold block">
-                SIRTOY LENDING PLUS
+                LOAN MANAGEMENT SYSTEM
               </span>
             </div>
           </div>

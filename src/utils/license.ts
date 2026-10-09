@@ -482,7 +482,7 @@ export const saveEulaAcceptance = (userName: string): EulaAcceptance => {
  */
 export const EULA_TEXT_CONTENT = {
   title: 'END USER LICENSE AGREEMENT (EULA) & FINANCIAL LIABILITY DISCLAIMER',
-  subtitle: 'SIRTOY LENDING PLUS, INC. - Universal Microfinance & Loan Management System',
+  subtitle: 'LOAN MANAGEMENT SYSTEM, INC. - Universal Microfinance & Loan Management System',
   version: 'Version 2026.1 Commercial Offline Release',
   sections: [
     {

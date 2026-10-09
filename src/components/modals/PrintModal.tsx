@@ -176,7 +176,7 @@ export const PrintModal: React.FC = () => {
         {/* Bottom Helper Bar */}
         <div className="px-5 py-2.5 bg-slate-50 border-t border-slate-200 text-slate-500 text-[11px] flex flex-wrap justify-between items-center gap-2 flex-none">
           <span>Tip: Supports standard A4 desktop printers and 58mm / 80mm thermal receipt printers.</span>
-          <span className="font-semibold text-slate-600">SIRTOY Lending Plus Document Engine</span>
+          <span className="font-semibold text-slate-600">Loan Management System Document Engine</span>
         </div>
       </div>
     </div>

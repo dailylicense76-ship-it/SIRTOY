@@ -47,17 +47,32 @@ export const Header: React.FC = () => {
   const license = getStoredLicense();
 
   return (
-    <header className="top sticky top-0 z-30 flex flex-wrap justify-between items-center bg-slate-50/90 border-b border-slate-200 backdrop-blur-md px-5 py-3 gap-2">
-      <div className="flex items-center gap-3">
+    <header 
+      style={{
+        backgroundImage: 'linear-gradient(rgba(10, 25, 47, 0.82), rgba(15, 23, 42, 0.92)), url(/header_banner.jpg)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center'
+      }}
+      className="top sticky top-0 z-30 flex flex-wrap justify-between items-center px-6 py-3.5 gap-2 shadow-2xl border-b-2 border-amber-500/50 relative overflow-hidden"
+    >
+      <div className="flex items-center gap-3 relative z-10">
         <button
           onClick={() => toggleMobileSidebar()}
-          className="md:hidden p-2 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-50"
+          className="md:hidden p-2 rounded-xl bg-white/10 border border-white/20 text-white hover:bg-white/20 cursor-pointer"
         >
           <Menu className="w-5 h-5" />
         </button>
+        <div className="w-10 h-10 rounded-xl overflow-hidden border-2 border-amber-400 shadow-md flex-none bg-slate-900 hidden sm:block">
+          <img src="/logo.png" alt="Lending System Logo" className="w-full h-full object-cover" />
+        </div>
         <div>
-          <h1 className="text-lg font-black text-slate-900 leading-tight">{title}</h1>
-          <div className="text-xs font-medium text-slate-500">{todayFormatted}</div>
+          <h1 className="text-lg font-black text-white tracking-tight leading-tight flex items-center gap-2">
+            <span>{title}</span>
+            <span className="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 uppercase tracking-wider shadow-sm">
+              Lending System
+            </span>
+          </h1>
+          <div className="text-xs font-semibold text-amber-200/90">{todayFormatted}</div>
         </div>
       </div>
 

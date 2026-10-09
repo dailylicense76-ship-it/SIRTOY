@@ -1,8 +1,8 @@
 {
   "$schema": "https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json",
   "appId": "com.sirtoy.lendingplus",
-  "productName": "Sirtoy Lending Plus",
-  "copyright": "Copyright © 2026 Sirtoy Lending",
+  "productName": "Lending Management System",
+  "copyright": "Copyright © 2026 Lending Management System",
   "directories": {
     "output": "release"
   },
@@ -13,8 +13,8 @@
   ],
   "extraMetadata": {
     "main": "electron-main.cjs",
-    "description": "SIRTOY LENDING PLUS - Offline Desktop Lending Management System",
-    "author": "Sirtoy Lending"
+    "description": "LENDING MANAGEMENT SYSTEM - Offline Desktop Lending Management System",
+    "author": "Lending Management System"
   },
   "publish": [
     {
@@ -36,7 +36,7 @@
     "allowToChangeInstallationDirectory": true,
     "createDesktopShortcut": true,
     "createStartMenuShortcut": true,
-    "shortcutName": "Sirtoy Lending Plus",
+    "shortcutName": "Lending Management System",
     "license": "license.txt",
     "installerLanguages": ["en_US"],
     "runAfterFinish": true

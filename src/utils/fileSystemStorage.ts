@@ -144,7 +144,7 @@ export async function writeDatabaseToPCFolder(dirHandle: FileSystemDirectoryHand
 
     // 1. Write partitioned table JSON files into the selected PC folder
     await writeJsonFile(dirHandle, 'DATABASE_INDEX.json', {
-      app: 'SIRTOY LENDING PLUS',
+      app: 'LOAN MANAGEMENT SYSTEM',
       company: db.settings.company,
       version: db.version,
       updatedAt: new Date().toISOString(),
@@ -237,7 +237,7 @@ export async function readDatabaseFromPCFolder(dirHandle: FileSystemDirectoryHan
       return {
         version: settings?.integrityRulesVersion || 10,
         settings: settings || {
-          company: 'SIRTOY LENDING PLUS, INC.',
+          company: 'LOAN MANAGEMENT SYSTEM, INC.',
           diskFolderName: dirHandle.name,
           diskFolderConfigured: true,
           diskDatabaseVersion: 1,

@@ -380,7 +380,7 @@ export const DeveloperPage: React.FC = () => {
     setTimeout(() => setCopiedKey(false), 2500);
   };
 
-  const salesMessageTemplate = `Magandang araw! Ito ang iyong Official Product Activation Key para sa SIRTOY LENDING PLUS SOFTWARE.
+  const salesMessageTemplate = `Magandang araw! Ito ang iyong Official Product Activation Key para sa LOAN MANAGEMENT SYSTEM SOFTWARE.
 
 Client / Business Name: ${clientName.toUpperCase()}
 License Type: ${licenseType.toUpperCase()}
@@ -391,7 +391,7 @@ Expiry Date: ${licenseType === 'Perpetual' ? 'Lifetime Perpetual (Walang Expirat
 ${generatedKey}
 
 Mga Hakbang sa Pag-activate:
-1. Buksan ang SIRTOY Lending Software sa inyong PC/Phone.
+1. Buksan ang Loan Management System sa inyong PC/Phone.
 2. Pumunta sa "Settings" -> "Manage Product Key & Machine ID".
 3. I-paste ang Product Activation Key sa itaas at i-check ang EULA Agreement.
 4. Pindutin ang "I-activate ang Product Key Now".
@@ -399,7 +399,7 @@ Mga Hakbang sa Pag-activate:
 Official Developer Facebook Support Page:
 https://www.facebook.com/profile.php?id=61595073996579
 
-Salamat sa pagtangkilik sa SIRTOY LENDING PLUS!`;
+Salamat sa pagtangkilik sa LOAN MANAGEMENT SYSTEM!`;
 
   const handleCopyMessage = () => {
     if (!salesMessageTemplate) return;

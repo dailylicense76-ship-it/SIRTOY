@@ -254,7 +254,7 @@ export const Sidebar: React.FC = () => {
                   }}
                   className="text-amber-400 text-[12px] font-extrabold block leading-tight tracking-wide truncate uppercase"
                 >
-                  {db.settings.company || 'SIRTOY LENDING'}
+                  {db.settings.company || 'LENDING MANAGEMENT SYSTEM'}
                 </strong>
                 <span className="text-slate-400 text-[9.5px] font-medium block tracking-wide">
                   Lending System

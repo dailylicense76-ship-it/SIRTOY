@@ -162,7 +162,7 @@ const AppContent: React.FC = () => {
                   : '⚠️ PRODUCT ACTIVATION REQUIRED'}
             </h1>
             <p className="text-[10px] sm:text-xs font-bold text-rose-300 tracking-wider mt-1 uppercase">
-              SIRTOY LENDING PLUS — OFFLINE PROTECTION SYSTEM
+              LOAN MANAGEMENT SYSTEM — OFFLINE PROTECTION SYSTEM
             </p>
           </div>
 
@@ -281,7 +281,7 @@ const AppContent: React.FC = () => {
           <div className="pt-4 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
             <div className="text-left">
               <div className="text-[10px] text-slate-400 uppercase font-black tracking-wider">Official Sales & Registration</div>
-              <div className="font-extrabold text-white">SIRTOY Lending Software Support</div>
+              <div className="font-extrabold text-white">Loan Management System Support</div>
             </div>
             <a
               href="https://www.facebook.com/profile.php?id=61595073996579"

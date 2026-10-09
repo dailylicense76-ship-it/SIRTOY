@@ -1,7 +1,7 @@
 {
-  "name": "SIRTOY LENDING PLUS",
-  "short_name": "SIRTOY LENDING",
-  "description": "Offline Desktop Lending Management System",
+  "name": "Loan Management System",
+  "short_name": "Loan Management",
+  "description": "Offline Desktop Loan Management System",
   "start_url": "/",
   "display": "standalone",
   "orientation": "any",

@@ -153,21 +153,18 @@ export const LoginPage: React.FC = () => {
         >
           {/* LEFT SIDE: Compact Auto-Adjusting Login Form (50% on Desktop) */}
           <div className="w-full md:w-1/2 p-4 sm:p-5 lg:p-6 flex flex-col justify-center border-b md:border-b-0 md:border-r border-blue-500/20 bg-slate-950/50">
-            {/* Brand Header with SIRTOY 3D Mascot Emblem */}
+            {/* Brand Header with Loan Management System Emblem */}
             <div className="flex items-center gap-2.5 mb-3.5 pb-3 border-b border-blue-500/20">
               <div className="w-10 h-10 rounded-lg bg-slate-900 p-0.5 border border-amber-400/50 shadow-md shrink-0 flex items-center justify-center overflow-hidden group">
                 <img
                   src={sirtoyMascot}
-                  alt="SIRTOY 3D Mascot Logo"
+                  alt="Loan Management System 3D Logo"
                   className="w-full h-full object-cover rounded group-hover:scale-105 transition-transform duration-300"
                 />
               </div>
               <div>
-                <h1 className="text-base sm:text-lg font-black tracking-tight leading-none text-white flex items-center gap-1">
-                  <span>SIRTOY</span>
-                  <span className="text-amber-400 font-extrabold text-sm sm:text-base">
-                    LENDING PLUS
-                  </span>
+                <h1 className="text-sm sm:text-base font-black tracking-tight leading-tight text-amber-400">
+                  LOAN MANAGEMENT SYSTEM
                 </h1>
                 <p className="text-[9.5px] font-bold tracking-wider uppercase text-sky-300/80 mt-0.5 flex items-center gap-1">
                   <span>Fast</span>
@@ -392,7 +389,7 @@ export const LoginPage: React.FC = () => {
               <div className="relative z-10 w-full flex items-center justify-center p-1">
                 <img
                   src={sirtoyMascotFull}
-                  alt="SIRTOY Lending Plus Official 3D Mascot Logo"
+                  alt="Loan Management System Official 3D Mascot Logo"
                   className="w-full h-auto max-h-[310px] sm:max-h-[350px] object-contain drop-shadow-[0_20px_35px_rgba(0,0,0,0.85)] hover:scale-[1.03] transition-transform duration-300"
                 />
               </div>
