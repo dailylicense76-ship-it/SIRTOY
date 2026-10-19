@@ -22,7 +22,8 @@ import {
   audit,
   safeStorage,
   SESSION,
-  normalizeSecurity
+  normalizeSecurity,
+  seed
 } from '../utils/storage';
 import {
   today,
@@ -254,10 +255,36 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     if (existingInFolder) {
       setDb(existingInFolder);
       saveDB(existingInFolder);
-      showToast(`PC Database Folder Connected! Loaded existing database from ${handle.name}.`);
+      showToast(`✓ PC Database Loaded! Loaded ${existingInFolder.loans?.length || 0} loans and ${existingInFolder.borrowers?.length || 0} borrowers from ${handle.name}.`);
     } else {
-      await writeDatabaseToPCFolder(handle, db, { includeAssets: true });
-      showToast(`PC Database Folder Connected! Database saved to ${handle.name}.`);
+      // The selected folder has NO database backup files!
+      const hasExistingData = db.loans.length > 0 || db.borrowers.length > 0;
+      let startFresh = false;
+      if (hasExistingData) {
+        startFresh = window.confirm(
+          `Ang napiling folder ("${handle.name}") ay WALANG LAMANG DATABASE BACKUP.\n\n` +
+          `• Pindutin ang [OK] kung nais mong mag-umpisa sa MALINIS NA ZERO DATABASE (₱0.00 / Fresh Start) para sa folder na ito.\n\n` +
+          `• Pindutin ang [Cancel] kung nais mong kopyahin at i-save ang kasalukuyang records sa bagong folder na ito.`
+        );
+      }
+      if (startFresh) {
+        const cleanDB: Database = {
+          ...seed(),
+          settings: {
+            ...db.settings,
+            diskFolderName: handle.name,
+            diskFolderConfigured: true,
+          },
+          users: db.users
+        };
+        setDb(cleanDB);
+        saveDB(cleanDB);
+        await writeDatabaseToPCFolder(handle, cleanDB, { includeAssets: true });
+        showToast(`✓ Connected! Nagsimula sa malinis na ₱0.00 zero database sa ${handle.name}.`);
+      } else {
+        await writeDatabaseToPCFolder(handle, db, { includeAssets: true });
+        showToast(`PC Database Folder Connected! Database saved to ${handle.name}.`);
+      }
     }
     return true;
   };

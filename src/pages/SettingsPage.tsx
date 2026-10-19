@@ -16,7 +16,8 @@ import {
   Key,
   FileText,
   Award,
-  Sparkles
+  Sparkles,
+  Trash2
 } from 'lucide-react';
 import { exportLoansToCSV, exportPaymentsToCSV, exportBorrowersToCSV } from '../utils/calculations';
 import { getStoredLicense } from '../utils/license';
@@ -36,7 +37,8 @@ export const SettingsPage: React.FC = () => {
     connectPCFolder,
     reconnectPCFolder,
     syncToPCFolder,
-    disconnectPCFolder
+    disconnectPCFolder,
+    wipeDatabaseToPristine
   } = useApp();
 
   const currentLicense = getStoredLicense();
@@ -393,6 +395,28 @@ export const SettingsPage: React.FC = () => {
             className="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs shadow-sm transition-colors cursor-pointer"
           >
             Auto-Repair & Clean Database Links
+          </button>
+        </div>
+
+        {/* Reset Database to Zero / Fresh Client Handover */}
+        <div className="card bg-white p-5 rounded-2xl border border-rose-200 shadow-sm space-y-3">
+          <div className="flex items-center gap-2">
+            <Trash2 className="w-5 h-5 text-rose-600" />
+            <h3 className="font-extrabold text-sm text-slate-900">Reset System Database to Zero (Fresh Start)</h3>
+          </div>
+          <p className="text-xs text-slate-600 leading-relaxed">
+            Gamitin ito bago ibigay ang software sa bagong kliyente o kapag nais mag-umpisa sa malinis na <b>₱0.00 zero database</b>. Buburahin nito ang lahat ng sample borrowers, test loans, at collection records ngunit <b>mananatili ang iyong Admin account at lisensya</b>.
+          </p>
+          <button
+            onClick={() => {
+              if (window.confirm("BABALA: Sigurado ka ba na nais mong i-reset ang buong database pabalik sa ZERO?\n\nMabubura ang lahat ng pautang, bayad, at borrowers. Mananatili ang iyong Admin account para makapag-log in ka pa rin.")) {
+                wipeDatabaseToPristine();
+              }
+            }}
+            className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-black text-xs shadow-sm transition-colors cursor-pointer"
+          >
+            <Trash2 className="w-4 h-4" />
+            <span>Wipe All Sample Records & Reset to Zero</span>
           </button>
         </div>
 

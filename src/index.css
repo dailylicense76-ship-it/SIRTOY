@@ -1,38 +1,8 @@
 @import "tailwindcss";
 
 /* -------------------------------------------------------------
- * 3D ANIMATED SIDEBAR ICONS & TACTILE DEPTH
+ * 3D TACTILE SIDEBAR ICONS (FAST, ZERO-LAG STATIC 3D DEPTH)
  * ------------------------------------------------------------- */
-@keyframes iconFloat3D {
-  0%, 100% {
-    transform: perspective(600px) rotateX(0deg) rotateY(0deg) translateY(0px);
-  }
-  25% {
-    transform: perspective(600px) rotateX(7deg) rotateY(-8deg) translateY(-2px);
-  }
-  50% {
-    transform: perspective(600px) rotateX(0deg) rotateY(0deg) translateY(-3px);
-  }
-  75% {
-    transform: perspective(600px) rotateX(-6deg) rotateY(7deg) translateY(-1px);
-  }
-}
-
-@keyframes iconPulseGlow {
-  0%, 100% {
-    box-shadow: 
-      0 4px 8px -1px rgba(120, 53, 15, 0.35),
-      0 2px 0 rgba(146, 64, 14, 0.5),
-      inset 0 1px 1px rgba(255, 255, 255, 0.8);
-  }
-  50% {
-    box-shadow: 
-      0 6px 14px 0px rgba(217, 119, 6, 0.55),
-      0 2.5px 0 rgba(180, 83, 9, 0.7),
-      inset 0 1px 2px rgba(255, 255, 255, 0.95);
-  }
-}
-
 .icon-3d-wrapper {
   position: relative;
   display: inline-flex;
@@ -41,14 +11,11 @@
   width: 2.25rem;
   height: 2.25rem;
   border-radius: 0.75rem;
-  transform-style: preserve-3d;
-  perspective: 600px;
-  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.35s ease, background 0.3s ease;
   background-color: #fef3c7;
   background: linear-gradient(145deg, #fffbeb 0%, #fef3c7 45%, #fde68a 100%);
   box-shadow: 
-    0 4px 6px -1px rgba(120, 53, 15, 0.25),
-    0 2px 0 rgba(180, 83, 9, 0.45),
+    0 2px 4px -1px rgba(120, 53, 15, 0.2),
+    0 1.5px 0 rgba(180, 83, 9, 0.4),
     inset 0 1px 1px rgba(255, 255, 255, 0.9);
   border: 1px solid rgba(245, 158, 11, 0.4);
 }
@@ -57,58 +24,22 @@
   background-color: #f59e0b;
   background: linear-gradient(145deg, #fef08a 0%, #f59e0b 60%, #d97706 100%);
   box-shadow: 
-    0 5px 12px -1px rgba(180, 83, 9, 0.5),
-    0 2.5px 0 rgba(146, 64, 14, 0.75),
+    0 3px 8px -1px rgba(180, 83, 9, 0.4),
+    0 2px 0 rgba(146, 64, 14, 0.6),
     inset 0 1px 2px rgba(255, 255, 255, 0.9);
   border: 1px solid rgba(217, 119, 6, 0.6);
-  animation: iconPulseGlow 3s ease-in-out infinite;
 }
 
 .icon-3d-glyph {
-  filter: drop-shadow(0 2px 2px rgba(120, 53, 15, 0.35));
-  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  filter: drop-shadow(0 1px 1px rgba(120, 53, 15, 0.3));
 }
 
-/* Staggered continuous 3D floating animation */
-.icon-3d-animated {
-  animation: iconFloat3D 4.2s ease-in-out infinite;
-}
-
-.icon-3d-delay-0 { animation-delay: 0s; }
-.icon-3d-delay-1 { animation-delay: 0.25s; }
-.icon-3d-delay-2 { animation-delay: 0.5s; }
-.icon-3d-delay-3 { animation-delay: 0.75s; }
-.icon-3d-delay-4 { animation-delay: 1s; }
-.icon-3d-delay-5 { animation-delay: 1.25s; }
-.icon-3d-delay-6 { animation-delay: 1.5s; }
-.icon-3d-delay-7 { animation-delay: 1.75s; }
-.icon-3d-delay-8 { animation-delay: 2s; }
-.icon-3d-delay-9 { animation-delay: 2.25s; }
-.icon-3d-delay-10 { animation-delay: 2.5s; }
-.icon-3d-delay-11 { animation-delay: 2.75s; }
-.icon-3d-delay-12 { animation-delay: 3s; }
-.icon-3d-delay-13 { animation-delay: 3.25s; }
-.icon-3d-delay-14 { animation-delay: 3.5s; }
-.icon-3d-delay-15 { animation-delay: 3.75s; }
-
-/* Interactive Hover Reactions */
 .nav-item-btn:hover .icon-3d-wrapper {
-  transform: perspective(600px) rotateX(14deg) rotateY(-12deg) translateY(-3px) scale(1.12);
+  background: linear-gradient(145deg, #ffffff 0%, #fef3c7 60%, #fde68a 100%);
   box-shadow: 
-    0 8px 16px -2px rgba(120, 53, 15, 0.45),
-    0 3px 0 rgba(146, 64, 14, 0.65),
+    0 4px 8px -1px rgba(120, 53, 15, 0.3),
+    0 2px 0 rgba(146, 64, 14, 0.5),
     inset 0 1px 2px rgba(255, 255, 255, 0.95);
-}
-
-.nav-item-btn:hover .icon-3d-glyph {
-  transform: scale(1.1) translateZ(10px);
-}
-
-.nav-item-btn:active .icon-3d-wrapper {
-  transform: perspective(600px) translateY(1px) scale(0.98);
-  box-shadow: 
-    0 2px 4px rgba(120, 53, 15, 0.3),
-    0 1px 0 rgba(146, 64, 14, 0.5);
 }
 
 /* -------------------------------------------------------------
@@ -367,59 +298,23 @@ table {
 }
 
 /* -------------------------------------------------------------
- * STUNNING 3D ROTATE & BOUNCE ENTRANCE ANIMATION FOR ALL MODALS & FORMS
+ * INSTANT ZERO-LAG MODALS & CLEAN 3D CONTAINERS
  * ------------------------------------------------------------- */
-@keyframes modal3DEntrance {
-  0% {
-    opacity: 0;
-    transform: perspective(1000px) rotateX(16deg) rotateY(-8deg) scale(0.85) translateY(40px);
-    box-shadow: 0 5px 15px rgba(15, 23, 42, 0.1);
-  }
-  70% {
-    transform: perspective(1000px) rotateX(-2deg) rotateY(2deg) scale(1.02) translateY(-4px);
-    box-shadow: 0 35px 60px rgba(15, 23, 42, 0.35);
-  }
-  100% {
-    opacity: 1;
-    transform: perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1) translateY(0);
-    box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.45), 0 0 0 2px rgba(255, 255, 255, 0.95) inset;
-  }
-}
-
 .animate-3d-modal {
-  animation: modal3DEntrance 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-  transform-origin: center bottom;
-  backface-visibility: hidden;
-  will-change: transform, opacity;
+  transform: none;
+  opacity: 1;
 }
 
 /* -------------------------------------------------------------
- * INTERACTIVE 3D EFFECTS & CONTINOUS FLOATING FOR LOGIN SCREEN
+ * CLEAN STATIC 3D BRANDING FOR LOGIN SCREEN
  * ------------------------------------------------------------- */
-@keyframes logo3DFloat {
-  0%, 100% {
-    transform: perspective(400px) rotateY(-12deg) rotateX(12deg) translateY(0);
-    box-shadow: 0 10px 22px rgba(217, 119, 6, 0.35);
-  }
-  50% {
-    transform: perspective(400px) rotateY(12deg) rotateX(-6deg) translateY(-6px);
-    box-shadow: 0 16px 30px rgba(217, 119, 6, 0.55);
-  }
-}
-
 .logo-3d-float {
-  animation: logo3DFloat 4.2s ease-in-out infinite;
+  box-shadow: 0 4px 14px rgba(217, 119, 6, 0.3);
 }
 
 .card-3d-login {
-  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease;
-  transform-style: preserve-3d;
-  perspective: 1000px;
-}
-
-.card-3d-login:hover {
-  transform: perspective(1000px) rotateX(3deg) rotateY(-3deg) translateY(-2px);
-  box-shadow: 0 35px 70px rgba(15, 23, 42, 0.28), 0 0 0 2px rgba(255, 255, 255, 0.9) inset;
+  background-color: #ffffff;
+  box-shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.25);
 }
 
 .input-3d {
