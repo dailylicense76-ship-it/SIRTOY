@@ -9,7 +9,7 @@ function createWindow() {
     height: 860,
     minWidth: 1024,
     minHeight: 700,
-    title: 'Lending Management System — Offline Desktop System',
+    title: 'Loan Management System — Offline Desktop Edition',
     icon: path.join(__dirname, 'public', 'icon-512.png'),
     webPreferences: {
       nodeIntegration: false,
@@ -22,7 +22,26 @@ function createWindow() {
   });
 
   // Load the compiled Vite single-page application
-  mainWindow.loadFile(path.join(__dirname, 'dist', 'index.html'));
+  const indexPath = path.join(__dirname, 'dist', 'index.html');
+  mainWindow.loadFile(indexPath).catch((err) => {
+    console.error('Failed to load application index:', err);
+    dialog.showErrorBox(
+      'System Load Error',
+      'Hindi ma-load ang Loan Management System assets. Siguraduhing kumpleto ang pagkakagawa ng dist folder.'
+    );
+  });
+
+  // Handle load failure event gracefully
+  mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription, validatedURL) => {
+    console.error('Load failed:', errorCode, errorDescription, validatedURL);
+  });
+
+  // Allow F12 or Ctrl+Shift+I for DevTools inspection
+  mainWindow.webContents.on('before-input-event', (event, input) => {
+    if (input.key === 'F12' || (input.control && input.shift && input.key.toLowerCase() === 'i')) {
+      mainWindow.webContents.toggleDevTools();
+    }
+  });
 
   mainWindow.once('ready-to-show', () => {
     mainWindow.maximize();
