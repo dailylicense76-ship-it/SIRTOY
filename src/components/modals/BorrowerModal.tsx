@@ -42,7 +42,8 @@ export const BorrowerModal: React.FC = () => {
     reader.onload = () => {
       const img = new Image();
       img.onload = () => {
-        const max = 1400;
+        // High-efficiency fast compression: max 700px, 0.65 quality (< 40KB footprint)
+        const max = 700;
         const scale = Math.min(1, max / img.width, max / img.height);
         const w = Math.max(1, Math.round(img.width * scale));
         const h = Math.max(1, Math.round(img.height * scale));
@@ -51,7 +52,7 @@ export const BorrowerModal: React.FC = () => {
         canvas.height = h;
         const ctx = canvas.getContext('2d');
         ctx?.drawImage(img, 0, 0, w, h);
-        const dataUrl = canvas.toDataURL('image/jpeg', 0.82);
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.65);
         setIdImage(dataUrl);
         setIdImageName(file.name);
       };
@@ -60,35 +61,44 @@ export const BorrowerModal: React.FC = () => {
     reader.readAsDataURL(file);
   };
 
+  const [isSaving, setIsSaving] = useState(false);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSaving) return;
     if (!assignedCollector) {
       showToast('Selected area has no assigned collector. Assign a collector to this area first.', 'warn');
       return;
     }
-    const saved = saveBorrower(
-      {
-        first: first.trim(),
-        last: last.trim(),
-        contact: contact.trim(),
-        email: email.trim(),
-        address: address.trim(),
-        areaId,
-        collectorId: assignedCollector.id,
-        idType: idType.trim(),
-        idNo: idNo.trim(),
-        idImage,
-        idImageName,
-        comaker: comaker.trim(),
-        comakerContact: comakerContact.trim(),
-        notes: notes.trim()
-      },
-      editId
-    );
 
-    // If a new borrower was successfully added, automatically trigger the Loan Modal pre-filled with this borrower
-    if (saved && !editId) {
-      openModal('loanModal', { borrowerId: saved.id, autoCreated: true });
+    setIsSaving(true);
+    try {
+      const saved = saveBorrower(
+        {
+          first: first.trim(),
+          last: last.trim(),
+          contact: contact.trim(),
+          email: email.trim(),
+          address: address.trim(),
+          areaId,
+          collectorId: assignedCollector.id,
+          idType: idType.trim(),
+          idNo: idNo.trim(),
+          idImage,
+          idImageName,
+          comaker: comaker.trim(),
+          comakerContact: comakerContact.trim(),
+          notes: notes.trim()
+        },
+        editId
+      );
+
+      // If a new borrower was successfully added, offer instant loan release modal
+      if (saved && !editId) {
+        openModal('loanModal', { borrowerId: saved.id, autoCreated: true });
+      }
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -351,9 +361,10 @@ export const BorrowerModal: React.FC = () => {
               </button>
               <button
                 type="submit"
-                className="btn-3d-blue px-6 py-2 rounded-xl text-xs font-black shadow-lg cursor-pointer"
+                disabled={isSaving}
+                className="btn-3d-blue px-6 py-2 rounded-xl text-xs font-black shadow-lg cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {editId ? 'Save Changes' : 'Save & Register Borrower'}
+                {isSaving ? 'Saving...' : editId ? 'Save Changes' : 'Save & Register Borrower'}
               </button>
             </div>
           </div>

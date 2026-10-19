@@ -11,13 +11,17 @@ export const BorrowersPage: React.FC = () => {
   const [search, setSearch] = useState('');
 
   const q = search.trim().toLowerCase();
-  const rows = db.borrowers.filter(b => (bname(b) + ' ' + b.contact + ' ' + b.idNo + ' ' + b.id).toLowerCase().includes(q));
+  const rows = React.useMemo(() => {
+    return db.borrowers.filter(b => (bname(b) + ' ' + b.contact + ' ' + b.idNo + ' ' + b.id).toLowerCase().includes(q));
+  }, [db.borrowers, q]);
 
   const totalClients = db.borrowers.length;
-  const clientsWithActiveLoans = db.borrowers.filter(b => {
-    const bLoans = db.loans.filter(l => l.borrowerId === b.id && l.approvalStatus === 'Approved');
-    return bLoans.some(loanIsCurrent);
-  }).length;
+  const clientsWithActiveLoans = React.useMemo(() => {
+    const activeBorrowerIds = new Set(
+      db.loans.filter(l => l.approvalStatus === 'Approved' && loanIsCurrent(l)).map(l => l.borrowerId)
+    );
+    return db.borrowers.filter(b => activeBorrowerIds.has(b.id)).length;
+  }, [db.borrowers, db.loans]);
 
   return (
     <div className="space-y-4">

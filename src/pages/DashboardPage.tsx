@@ -47,44 +47,44 @@ import { printCollectorPerformanceReport } from '../utils/print';
 export const DashboardPage: React.FC = () => {
   const { db, go, openModal } = useApp();
 
-  const currentLoans = db.loans.filter(loanIsCurrent);
-  const totalOutstanding = currentLoans.reduce((sum, l) => sum + outstanding(l), 0);
-  const todayPayments = db.payments.filter(p => p.date === today());
-  const todayCollectionsAmt = todayPayments.reduce((sum, p) => sum + p.amount, 0);
-  const overdueLoans = db.loans.filter(l => status(l) === 'Overdue');
+  const currentLoans = React.useMemo(() => db.loans.filter(loanIsCurrent), [db.loans]);
+  const totalOutstanding = React.useMemo(() => currentLoans.reduce((sum, l) => sum + outstanding(l), 0), [currentLoans]);
+  const todayPayments = React.useMemo(() => db.payments.filter(p => p.date === today()), [db.payments]);
+  const todayCollectionsAmt = React.useMemo(() => todayPayments.reduce((sum, p) => sum + p.amount, 0), [todayPayments]);
+  const overdueLoans = React.useMemo(() => db.loans.filter(l => status(l) === 'Overdue'), [db.loans]);
 
-  const cashAvailable = systemCashOnHand(db);
-  const profit = netProfit(db);
+  const cashAvailable = React.useMemo(() => systemCashOnHand(db), [db]);
+  const profit = React.useMemo(() => netProfit(db), [db]);
 
   return (
-    <div className="space-y-5">
-      {/* Quick Action Command Center */}
+    <div className="space-y-4">
+      {/* Quick Action Command Center - Compact High-End Toolbar */}
       <div
         style={{
           backgroundColor: '#0f172a',
           backgroundImage: 'linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #312e81 100%)',
           color: '#ffffff'
         }}
-        className="relative overflow-hidden flex flex-wrap items-center justify-between gap-3 p-4 sm:p-5 rounded-3xl border border-slate-700 shadow-xl"
+        className="relative overflow-hidden flex flex-wrap items-center justify-between gap-2.5 px-4 py-3 rounded-2xl border border-slate-700/80 shadow-lg"
       >
-        <div className="relative z-10">
-          <div className="flex items-center gap-2">
-            <span
-              style={{ backgroundColor: 'rgba(251, 191, 36, 0.2)', color: '#fbbf24', borderColor: 'rgba(251, 191, 36, 0.4)' }}
-              className="p-1.5 rounded-xl border"
-            >
-              <Sparkles className="w-4 h-4" />
-            </span>
-            <h2 style={{ color: '#ffffff' }} className="text-base font-black leading-tight">
-              Quick Operations Command
+        <div className="relative z-10 flex items-center gap-2">
+          <span
+            style={{ backgroundColor: 'rgba(251, 191, 36, 0.2)', color: '#fbbf24', borderColor: 'rgba(251, 191, 36, 0.4)' }}
+            className="p-1 rounded-lg border"
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+          </span>
+          <div>
+            <h2 style={{ color: '#ffffff' }} className="text-sm font-black leading-tight">
+              Operations Center
             </h2>
+            <p style={{ color: '#94a3b8' }} className="text-[11px]">
+              Daily field transactions & quick actions
+            </p>
           </div>
-          <p style={{ color: '#cbd5e1' }} className="text-xs mt-1">
-            Instant 1-click access to daily field transactions, payments, and releases
-          </p>
         </div>
 
-        <div className="relative z-10 flex flex-wrap items-center gap-2">
+        <div className="relative z-10 flex flex-wrap items-center gap-1.5">
           <button
             onClick={() => openModal('paymentModal')}
             style={{
@@ -93,9 +93,9 @@ export const DashboardPage: React.FC = () => {
               color: '#ffffff',
               borderColor: '#34d399'
             }}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-2xl font-black text-xs shadow-lg hover:brightness-110 active:scale-95 transition-all border cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-black text-xs shadow-md hover:brightness-110 active:scale-95 transition-all border cursor-pointer"
           >
-            <CreditCard className="w-4 h-4 text-white" />
+            <CreditCard className="w-3.5 h-3.5 text-white" />
             <span>+ Record Payment</span>
           </button>
 
@@ -107,9 +107,9 @@ export const DashboardPage: React.FC = () => {
               color: '#ffffff',
               borderColor: '#60a5fa'
             }}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-2xl font-black text-xs shadow-lg hover:brightness-110 active:scale-95 transition-all border cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-black text-xs shadow-md hover:brightness-110 active:scale-95 transition-all border cursor-pointer"
           >
-            <Plus className="w-4 h-4 text-white" />
+            <Plus className="w-3.5 h-3.5 text-white" />
             <span>+ New Loan</span>
           </button>
 
@@ -121,9 +121,9 @@ export const DashboardPage: React.FC = () => {
               color: '#ffffff',
               borderColor: '#fcd34d'
             }}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-2xl font-black text-xs shadow-lg hover:brightness-110 active:scale-95 transition-all border cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-black text-xs shadow-md hover:brightness-110 active:scale-95 transition-all border cursor-pointer"
           >
-            <UserPlus className="w-4 h-4 text-white" />
+            <UserPlus className="w-3.5 h-3.5 text-white" />
             <span>+ Add Borrower</span>
           </button>
 
@@ -132,12 +132,12 @@ export const DashboardPage: React.FC = () => {
             style={{
               backgroundColor: '#1e293b',
               color: '#ffffff',
-              borderColor: 'rgba(255, 255, 255, 0.25)'
+              borderColor: 'rgba(255, 255, 255, 0.2)'
             }}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-2xl font-bold text-xs border hover:bg-slate-700 transition-all cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold text-xs border hover:bg-slate-700 transition-all cursor-pointer"
           >
-            <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
-            <span>Daily Collections</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+            <span>Collections</span>
           </button>
 
           <button
@@ -145,19 +145,19 @@ export const DashboardPage: React.FC = () => {
             style={{
               backgroundColor: '#1e293b',
               color: '#ffffff',
-              borderColor: 'rgba(255, 255, 255, 0.25)'
+              borderColor: 'rgba(255, 255, 255, 0.2)'
             }}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-2xl font-bold text-xs border hover:bg-slate-700 transition-all cursor-pointer"
+            className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl font-bold text-xs border hover:bg-slate-700 transition-all cursor-pointer"
             title="Open Cash Denomination Bill Counter"
           >
-            <Calculator className="w-4 h-4 text-blue-400" />
-            <span>Cash Counter</span>
+            <Calculator className="w-3.5 h-3.5 text-blue-400" />
+            <span>Counter</span>
           </button>
         </div>
       </div>
 
-      {/* Top 4 KPI 3D Mascot Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* Top 4 KPI High-End Compact Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         {/* Active Loans Card - Royal Blue */}
         <div
           style={{
@@ -166,20 +166,20 @@ export const DashboardPage: React.FC = () => {
             color: '#ffffff',
             borderColor: '#60a5fa'
           }}
-          className="p-5 rounded-3xl border shadow-xl flex items-center justify-between group hover:-translate-y-1 transition-all"
+          className="p-3.5 rounded-2xl border shadow-md flex items-center justify-between group hover:-translate-y-0.5 transition-all"
         >
           <div>
-            <span style={{ color: '#bfdbfe' }} className="text-[11px] font-black uppercase tracking-wider block">
+            <span style={{ color: '#bfdbfe' }} className="text-[10px] font-black uppercase tracking-wider block">
               Active Loans
             </span>
-            <div style={{ color: '#ffffff' }} className="text-3xl font-black mt-1">
+            <div style={{ color: '#ffffff' }} className="text-2xl font-black mt-0.5">
               {currentLoans.length}
             </div>
-            <span style={{ color: '#dbeafe' }} className="text-[10px] font-semibold block mt-1">
+            <span style={{ color: '#dbeafe' }} className="text-[10px] font-medium block mt-0.5">
               Ongoing borrower accounts
             </span>
           </div>
-          <div className="w-14 h-14 rounded-2xl overflow-hidden border border-white/30 shadow-md group-hover:scale-110 transition-transform bg-white/95">
+          <div className="w-10 h-10 rounded-xl overflow-hidden border border-white/30 shadow-sm group-hover:scale-105 transition-transform bg-white/95">
             <img src={activeLoansIcon} alt="Active Loans 3D" className="w-full h-full object-cover" />
           </div>
         </div>
@@ -192,20 +192,20 @@ export const DashboardPage: React.FC = () => {
             color: '#ffffff',
             borderColor: '#fde68a'
           }}
-          className="p-5 rounded-3xl border shadow-xl flex items-center justify-between group hover:-translate-y-1 transition-all"
+          className="p-3.5 rounded-2xl border shadow-md flex items-center justify-between group hover:-translate-y-0.5 transition-all"
         >
           <div>
-            <span style={{ color: '#fef3c7' }} className="text-[11px] font-black uppercase tracking-wider block">
+            <span style={{ color: '#fef3c7' }} className="text-[10px] font-black uppercase tracking-wider block">
               Total Outstanding
             </span>
-            <div style={{ color: '#ffffff' }} className="text-xl sm:text-2xl font-black mt-1">
+            <div style={{ color: '#ffffff' }} className="text-lg sm:text-xl font-black mt-0.5">
               {money(totalOutstanding)}
             </div>
-            <span style={{ color: '#fef3c7' }} className="text-[10px] font-semibold block mt-1">
-              Total principal + interest dues
+            <span style={{ color: '#fef3c7' }} className="text-[10px] font-medium block mt-0.5">
+              Principal + interest dues
             </span>
           </div>
-          <div className="w-14 h-14 rounded-2xl overflow-hidden border border-white/30 shadow-md group-hover:scale-110 transition-transform bg-white/95">
+          <div className="w-10 h-10 rounded-xl overflow-hidden border border-white/30 shadow-sm group-hover:scale-105 transition-transform bg-white/95">
             <img src={outstandingIcon} alt="Outstanding 3D" className="w-full h-full object-cover" />
           </div>
         </div>
@@ -218,20 +218,20 @@ export const DashboardPage: React.FC = () => {
             color: '#ffffff',
             borderColor: '#6ee7b7'
           }}
-          className="p-5 rounded-3xl border shadow-xl flex items-center justify-between group hover:-translate-y-1 transition-all"
+          className="p-3.5 rounded-2xl border shadow-md flex items-center justify-between group hover:-translate-y-0.5 transition-all"
         >
           <div>
-            <span style={{ color: '#d1fae5' }} className="text-[11px] font-black uppercase tracking-wider block">
+            <span style={{ color: '#d1fae5' }} className="text-[10px] font-black uppercase tracking-wider block">
               Today&apos;s Collections
             </span>
-            <div style={{ color: '#ffffff' }} className="text-xl sm:text-2xl font-black mt-1">
+            <div style={{ color: '#ffffff' }} className="text-lg sm:text-xl font-black mt-0.5">
               {money(todayCollectionsAmt)}
             </div>
-            <span style={{ color: '#d1fae5' }} className="text-[10px] font-semibold block mt-1">
+            <span style={{ color: '#d1fae5' }} className="text-[10px] font-medium block mt-0.5">
               {todayPayments.length} posted payments
             </span>
           </div>
-          <div className="w-14 h-14 rounded-2xl overflow-hidden border border-white/30 shadow-md group-hover:scale-110 transition-transform bg-white/95">
+          <div className="w-10 h-10 rounded-xl overflow-hidden border border-white/30 shadow-sm group-hover:scale-105 transition-transform bg-white/95">
             <img src={collectionsCardIcon} alt="Collections 3D" className="w-full h-full object-cover" />
           </div>
         </div>
@@ -244,145 +244,145 @@ export const DashboardPage: React.FC = () => {
             color: '#ffffff',
             borderColor: '#fda4af'
           }}
-          className="p-5 rounded-3xl border shadow-xl flex items-center justify-between group hover:-translate-y-1 transition-all"
+          className="p-3.5 rounded-2xl border shadow-md flex items-center justify-between group hover:-translate-y-0.5 transition-all"
         >
           <div>
-            <span style={{ color: '#ffe4e6' }} className="text-[11px] font-black uppercase tracking-wider block">
+            <span style={{ color: '#ffe4e6' }} className="text-[10px] font-black uppercase tracking-wider block">
               Overdue Accounts
             </span>
-            <div style={{ color: '#ffffff' }} className="text-3xl font-black mt-1">
+            <div style={{ color: '#ffffff' }} className="text-2xl font-black mt-0.5">
               {overdueLoans.length}
             </div>
-            <span style={{ color: '#ffe4e6' }} className="text-[10px] font-semibold block mt-1">
-              Accounts with delayed payments
+            <span style={{ color: '#ffe4e6' }} className="text-[10px] font-medium block mt-0.5">
+              Delayed loan accounts
             </span>
           </div>
-          <div className="w-14 h-14 rounded-2xl overflow-hidden border border-white/30 shadow-md group-hover:scale-110 transition-transform bg-white/95">
+          <div className="w-10 h-10 rounded-xl overflow-hidden border border-white/30 shadow-sm group-hover:scale-105 transition-transform bg-white/95">
             <img src={overdueCardIcon} alt="Overdue 3D" className="w-full h-full object-cover" />
           </div>
         </div>
       </div>
 
-      {/* 3 Secondary Cards: Capital, Expenses, Net Profit with 3D Mascot Icons */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {/* 3 Secondary Cards: Capital, Expenses, Net Profit */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         {/* Capital Card */}
         <div
-          style={{ backgroundColor: '#ffffff', borderColor: '#cbd5e1' }}
-          className="p-5 rounded-3xl border shadow-md flex items-center justify-between group hover:shadow-lg transition-all"
+          style={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0' }}
+          className="p-3.5 rounded-2xl border shadow-sm flex items-center justify-between group hover:shadow-md transition-all"
         >
-          <div className="min-w-0 flex-1 pr-3">
-            <div className="flex justify-between items-center mb-1">
-              <span className="text-[11px] font-black uppercase tracking-wider text-blue-700">Capital / Available Cash</span>
-              <button onClick={() => go('capital')} className="text-xs font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1 cursor-pointer">
+          <div className="min-w-0 flex-1 pr-2">
+            <div className="flex justify-between items-center mb-0.5">
+              <span className="text-[10px] font-black uppercase tracking-wider text-blue-700">Capital / Available Cash</span>
+              <button onClick={() => go('capital')} className="text-[11px] font-bold text-blue-600 hover:text-blue-800 flex items-center gap-0.5 cursor-pointer">
                 <span>Manage</span>
                 <ArrowRight className="w-3 h-3" />
               </button>
             </div>
-            <div style={{ color: cashAvailable < 0 ? '#dc2626' : '#0f172a' }} className="text-xl font-black truncate">
+            <div style={{ color: cashAvailable < 0 ? '#dc2626' : '#0f172a' }} className="text-lg font-black truncate">
               {money(cashAvailable)}
             </div>
-            <span className="text-[10px] font-semibold text-slate-500 block mt-1 truncate">
-              Contributed: <b>{money(capitalAdded(db))}</b> • Released: <b>{money(loanReleasedTotal(db))}</b>
+            <span className="text-[10px] text-slate-500 block truncate mt-0.5">
+              Injected: <b>{money(capitalAdded(db))}</b> • Released: <b>{money(loanReleasedTotal(db))}</b>
             </span>
           </div>
-          <div className="w-12 h-12 rounded-2xl overflow-hidden border border-slate-200 shadow-sm flex-none group-hover:scale-110 transition-transform">
+          <div className="w-9 h-9 rounded-xl overflow-hidden border border-slate-200 shadow-xs flex-none group-hover:scale-105 transition-transform">
             <img src={capitalIcon} alt="Capital 3D" className="w-full h-full object-cover" />
           </div>
         </div>
 
         {/* Expenses Card */}
         <div
-          style={{ backgroundColor: '#ffffff', borderColor: '#cbd5e1' }}
-          className="p-5 rounded-3xl border shadow-md flex items-center justify-between group hover:shadow-lg transition-all"
+          style={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0' }}
+          className="p-3.5 rounded-2xl border shadow-sm flex items-center justify-between group hover:shadow-md transition-all"
         >
-          <div className="min-w-0 flex-1 pr-3">
-            <div className="flex justify-between items-center mb-1">
-              <span className="text-[11px] font-black uppercase tracking-wider text-amber-700">Expenses This Month</span>
-              <span style={{ backgroundColor: '#fef3c7', color: '#92400e' }} className="px-2 py-0.5 rounded-full text-[9px] font-bold">
+          <div className="min-w-0 flex-1 pr-2">
+            <div className="flex justify-between items-center mb-0.5">
+              <span className="text-[10px] font-black uppercase tracking-wider text-amber-700">Expenses This Month</span>
+              <span style={{ backgroundColor: '#fef3c7', color: '#92400e' }} className="px-1.5 py-0.2 rounded-md text-[9px] font-bold">
                 Tracker
               </span>
             </div>
-            <div style={{ color: '#0f172a' }} className="text-xl font-black truncate">
+            <div style={{ color: '#0f172a' }} className="text-lg font-black truncate">
               {money(expenseThisMonth(db))}
             </div>
-            <span className="text-[10px] font-semibold text-slate-500 block mt-1 truncate">
+            <span className="text-[10px] text-slate-500 block truncate mt-0.5">
               All-time operational: <b>{money(expenseTotal(db))}</b>
             </span>
           </div>
-          <div className="w-12 h-12 rounded-2xl overflow-hidden border border-slate-200 shadow-sm flex-none group-hover:scale-110 transition-transform">
+          <div className="w-9 h-9 rounded-xl overflow-hidden border border-slate-200 shadow-xs flex-none group-hover:scale-105 transition-transform">
             <img src={expensesIcon} alt="Expenses 3D" className="w-full h-full object-cover" />
           </div>
         </div>
 
         {/* Net Profit Card */}
         <div
-          style={{ backgroundColor: '#ffffff', borderColor: '#cbd5e1' }}
-          className="p-5 rounded-3xl border shadow-md flex items-center justify-between group hover:shadow-lg transition-all"
+          style={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0' }}
+          className="p-3.5 rounded-2xl border shadow-sm flex items-center justify-between group hover:shadow-md transition-all"
         >
-          <div className="min-w-0 flex-1 pr-3">
-            <div className="flex justify-between items-center mb-1">
-              <span className="text-[11px] font-black uppercase tracking-wider text-emerald-700">Net Profit / Loss</span>
+          <div className="min-w-0 flex-1 pr-2">
+            <div className="flex justify-between items-center mb-0.5">
+              <span className="text-[10px] font-black uppercase tracking-wider text-emerald-700">Net Profit / Loss</span>
               <span
                 style={{
                   backgroundColor: profit >= 0 ? '#d1fae5' : '#fee2e2',
                   color: profit >= 0 ? '#065f46' : '#991b1b'
                 }}
-                className="px-2 py-0.5 rounded-full text-[9px] font-extrabold"
+                className="px-1.5 py-0.2 rounded-md text-[9px] font-extrabold"
               >
                 {financialStatus(db)}
               </span>
             </div>
-            <div style={{ color: profit < 0 ? '#dc2626' : '#059669' }} className="text-xl font-black truncate">
+            <div style={{ color: profit < 0 ? '#dc2626' : '#059669' }} className="text-lg font-black truncate">
               {money(profit)}
             </div>
-            <span className="text-[10px] font-semibold text-slate-500 block mt-1 truncate">
+            <span className="text-[10px] text-slate-500 block truncate mt-0.5">
               Gross interest: <b className="text-emerald-700">{money(grossIncome(db))}</b>
             </span>
           </div>
-          <div className="w-12 h-12 rounded-2xl overflow-hidden border border-slate-200 shadow-sm flex-none group-hover:scale-110 transition-transform">
+          <div className="w-9 h-9 rounded-xl overflow-hidden border border-slate-200 shadow-xs flex-none group-hover:scale-105 transition-transform">
             <img src={profitIcon} alt="Profit 3D" className="w-full h-full object-cover" />
           </div>
         </div>
       </div>
 
       {/* Financial Health & Cash Flow Grid */}
-      <div style={{ backgroundColor: '#ffffff', borderColor: '#cbd5e1' }} className="p-5 rounded-3xl border shadow-md">
-        <h3 style={{ color: '#0f172a' }} className="font-black text-sm mb-3 flex items-center gap-2">
-          <ShieldCheck className="w-4 h-4 text-indigo-600" />
+      <div style={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0' }} className="p-3.5 sm:p-4 rounded-2xl border shadow-sm">
+        <h3 style={{ color: '#0f172a' }} className="font-black text-xs mb-2.5 flex items-center gap-1.5">
+          <ShieldCheck className="w-3.5 h-3.5 text-indigo-600" />
           <span>Financial Health & Cash Flow Summary</span>
         </h3>
-        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 text-center">
-          <div style={{ backgroundColor: '#f8fafc', borderColor: '#e2e8f0' }} className="p-3 rounded-2xl border">
-            <span style={{ color: '#64748b' }} className="text-[10px] font-bold uppercase block">Capital Added</span>
-            <b style={{ color: '#0f172a' }} className="text-xs sm:text-sm font-black mt-0.5 block">{money(capitalAdded(db))}</b>
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2 text-center">
+          <div style={{ backgroundColor: '#f8fafc', borderColor: '#e2e8f0' }} className="p-2 rounded-xl border">
+            <span style={{ color: '#64748b' }} className="text-[9px] font-bold uppercase block">Capital Added</span>
+            <b style={{ color: '#0f172a' }} className="text-xs font-black mt-0.5 block">{money(capitalAdded(db))}</b>
           </div>
-          <div style={{ backgroundColor: '#eff6ff', borderColor: '#bfdbfe' }} className="p-3 rounded-2xl border">
-            <span style={{ color: '#1d4ed8' }} className="text-[10px] font-bold uppercase block">Loan Releases</span>
-            <b style={{ color: '#1e3a8a' }} className="text-xs sm:text-sm font-black mt-0.5 block">{money(loanReleasedTotal(db))}</b>
+          <div style={{ backgroundColor: '#eff6ff', borderColor: '#bfdbfe' }} className="p-2 rounded-xl border">
+            <span style={{ color: '#1d4ed8' }} className="text-[9px] font-bold uppercase block">Loan Releases</span>
+            <b style={{ color: '#1e3a8a' }} className="text-xs font-black mt-0.5 block">{money(loanReleasedTotal(db))}</b>
           </div>
-          <div style={{ backgroundColor: '#ecfdf5', borderColor: '#a7f3d0' }} className="p-3 rounded-2xl border">
-            <span style={{ color: '#047857' }} className="text-[10px] font-bold uppercase block">Principal In</span>
-            <b style={{ color: '#064e3b' }} className="text-xs sm:text-sm font-black mt-0.5 block">{money(principalCollectedTotal(db))}</b>
+          <div style={{ backgroundColor: '#ecfdf5', borderColor: '#a7f3d0' }} className="p-2 rounded-xl border">
+            <span style={{ color: '#047857' }} className="text-[9px] font-bold uppercase block">Principal In</span>
+            <b style={{ color: '#064e3b' }} className="text-xs font-black mt-0.5 block">{money(principalCollectedTotal(db))}</b>
           </div>
-          <div style={{ backgroundColor: '#ecfdf5', borderColor: '#a7f3d0' }} className="p-3 rounded-2xl border">
-            <span style={{ color: '#047857' }} className="text-[10px] font-bold uppercase block">Interest In</span>
-            <b style={{ color: '#064e3b' }} className="text-xs sm:text-sm font-black mt-0.5 block">{money(interestCollectedTotal(db))}</b>
+          <div style={{ backgroundColor: '#ecfdf5', borderColor: '#a7f3d0' }} className="p-2 rounded-xl border">
+            <span style={{ color: '#047857' }} className="text-[9px] font-bold uppercase block">Interest In</span>
+            <b style={{ color: '#064e3b' }} className="text-xs font-black mt-0.5 block">{money(interestCollectedTotal(db))}</b>
           </div>
-          <div style={{ backgroundColor: '#fffbeb', borderColor: '#fde68a' }} className="p-3 rounded-2xl border">
-            <span style={{ color: '#b45309' }} className="text-[10px] font-bold uppercase block">Total Expenses</span>
-            <b style={{ color: '#78350f' }} className="text-xs sm:text-sm font-black mt-0.5 block">{money(expenseTotal(db))}</b>
+          <div style={{ backgroundColor: '#fffbeb', borderColor: '#fde68a' }} className="p-2 rounded-xl border">
+            <span style={{ color: '#b45309' }} className="text-[9px] font-bold uppercase block">Expenses</span>
+            <b style={{ color: '#78350f' }} className="text-xs font-black mt-0.5 block">{money(expenseTotal(db))}</b>
           </div>
-          <div style={{ backgroundColor: '#eef2ff', borderColor: '#c7d2fe' }} className="p-3 rounded-2xl border">
-            <span style={{ color: '#4338ca' }} className="text-[10px] font-bold uppercase block">Net Cash Flow</span>
-            <b style={{ color: '#312e81' }} className="text-xs sm:text-sm font-black mt-0.5 block">{money(netCashFlow(db))}</b>
+          <div style={{ backgroundColor: '#eef2ff', borderColor: '#c7d2fe' }} className="p-2 rounded-xl border">
+            <span style={{ color: '#4338ca' }} className="text-[9px] font-bold uppercase block">Net Cash Flow</span>
+            <b style={{ color: '#312e81' }} className="text-xs font-black mt-0.5 block">{money(netCashFlow(db))}</b>
           </div>
-          <div style={{ backgroundColor: '#f0fdfa', borderColor: '#99f6e4' }} className="p-3 rounded-2xl border">
-            <span style={{ color: '#0f766e' }} className="text-[10px] font-bold uppercase block">System Cash</span>
-            <b style={{ color: '#134e4a' }} className="text-xs sm:text-sm font-black mt-0.5 block">{money(cashAvailable)}</b>
+          <div style={{ backgroundColor: '#f0fdfa', borderColor: '#99f6e4' }} className="p-2 rounded-xl border">
+            <span style={{ color: '#0f766e' }} className="text-[9px] font-bold uppercase block">System Cash</span>
+            <b style={{ color: '#134e4a' }} className="text-xs font-black mt-0.5 block">{money(cashAvailable)}</b>
           </div>
-          <div style={{ backgroundColor: '#faf5ff', borderColor: '#e9d5ff' }} className="p-3 rounded-2xl border">
-            <span style={{ color: '#7e22ce' }} className="text-[10px] font-bold uppercase block">Counted Cash</span>
-            <b style={{ color: '#581c87' }} className="text-xs sm:text-sm font-black mt-0.5 block">
+          <div style={{ backgroundColor: '#faf5ff', borderColor: '#e9d5ff' }} className="p-2 rounded-xl border">
+            <span style={{ color: '#7e22ce' }} className="text-[9px] font-bold uppercase block">Counted Cash</span>
+            <b style={{ color: '#581c87' }} className="text-xs font-black mt-0.5 block">
               {db.cashReconciliations[0] ? money(db.cashReconciliations[0].actualCash) : 'Not Counted'}
             </b>
           </div>
@@ -390,7 +390,7 @@ export const DashboardPage: React.FC = () => {
       </div>
 
       {/* Collector Daily Performance Table */}
-      <div style={{ backgroundColor: '#ffffff', borderColor: '#cbd5e1' }} className="p-5 rounded-3xl border shadow-md space-y-3">
+      <div style={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0' }} className="p-3.5 sm:p-4 rounded-2xl border shadow-sm space-y-2.5">
         <div className="flex flex-wrap justify-between items-center gap-2">
           <div>
             <h3 style={{ color: '#0f172a' }} className="font-black text-sm flex items-center gap-2">

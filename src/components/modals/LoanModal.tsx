@@ -119,8 +119,11 @@ export const LoanModal: React.FC = () => {
   const netProceeds = Math.max(0, round2(pNum - (feeDeductFromCash ? fNum : 0) - previousLoanBalance));
   const effectiveTotalPayable = plan.total + (feeDeductFromCash ? 0 : fNum);
 
+  const [isSaving, setIsSaving] = useState(false);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSaving) return;
     if (!borrowerId) {
       showToast('Please select a borrower.', 'warn');
       return;
@@ -129,27 +132,33 @@ export const LoanModal: React.FC = () => {
       showToast(`Ang bagong loan principal (${money(pNum)}) ay dapat mas malaki kaysa sa lumang balanse (${money(previousLoanBalance)}).`, 'warn');
       return;
     }
-    saveLoan(
-      {
-        borrowerId,
-        principal: pNum,
-        rate: rNum,
-        months: mNum,
-        frequency,
-        loanType,
-        method: loanType,
-        date,
-        disbursementMethod,
-        fee: fNum,
-        feePaid: feeDeductFromCash ? fNum : 0,
-        ref: ref.trim(),
-        remarks: remarks.trim(),
-        autoDeductLoanId: autoDeductPreviousLoan ? selectedAutoDeductLoanId : undefined,
-        renewedFrom: autoDeductPreviousLoan ? selectedAutoDeductLoanId : renewedFromId,
-        renewalRequestId
-      },
-      editId
-    );
+
+    setIsSaving(true);
+    try {
+      saveLoan(
+        {
+          borrowerId,
+          principal: pNum,
+          rate: rNum,
+          months: mNum,
+          frequency,
+          loanType,
+          method: loanType,
+          date,
+          disbursementMethod,
+          fee: fNum,
+          feePaid: feeDeductFromCash ? fNum : 0,
+          ref: ref.trim(),
+          remarks: remarks.trim(),
+          autoDeductLoanId: autoDeductPreviousLoan ? selectedAutoDeductLoanId : undefined,
+          renewedFrom: autoDeductPreviousLoan ? selectedAutoDeductLoanId : renewedFromId,
+          renewalRequestId
+        },
+        editId
+      );
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -754,10 +763,10 @@ export const LoanModal: React.FC = () => {
                   </button>
                   <button
                     type="submit"
-                    disabled={!borrowerId || pNum <= 0}
-                    className="btn-3d-blue px-5 py-2 rounded-xl text-xs font-black shadow-lg cursor-pointer disabled:opacity-50"
+                    disabled={isSaving || !borrowerId || pNum <= 0}
+                    className="btn-3d-blue px-5 py-2 rounded-xl text-xs font-black shadow-lg cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {editId ? 'Save Contract' : 'Release Loan'}
+                    {isSaving ? 'Saving Contract...' : editId ? 'Save Contract' : 'Release Loan'}
                   </button>
                 </div>
               </div>

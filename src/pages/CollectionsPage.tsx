@@ -22,23 +22,23 @@ export const CollectionsPage: React.FC = () => {
   const [paymentQuery, setPaymentQuery] = useState('');
   const [bulkSelected, setBulkSelected] = useState<Set<string>>(new Set());
 
-  const activeCollectorRows = collectionCustomerRows(db, collectorFilter, collectionDate);
-  const activeSectionRows = activeCollectorRows.filter(x => x.state === 'Active');
-  const overdueSectionRows = activeCollectorRows.filter(x => x.state === 'Overdue');
+  const activeCollectorRows = React.useMemo(() => collectionCustomerRows(db, collectorFilter, collectionDate), [db, collectorFilter, collectionDate]);
+  const activeSectionRows = React.useMemo(() => activeCollectorRows.filter(x => x.state === 'Active'), [activeCollectorRows]);
+  const overdueSectionRows = React.useMemo(() => activeCollectorRows.filter(x => x.state === 'Overdue'), [activeCollectorRows]);
 
-  const todayCollected = db.payments
+  const todayCollected = React.useMemo(() => db.payments
     .filter(p => p.date === collectionDate && (collectorFilter === 'ALL' || p.collectorId === collectorFilter))
-    .reduce((s, p) => s + p.amount, 0);
+    .reduce((s, p) => s + p.amount, 0), [db.payments, collectionDate, collectorFilter]);
 
-  const totalExpected = activeCollectorRows.reduce((s, x) => s + x.expectedToday, 0);
-  const totalBalance = activeCollectorRows.reduce((s, x) => s + x.totalOutstanding, 0);
-  const totalCapital = activeCollectorRows.reduce((s, x) => s + x.loans.reduce((q, l) => q + l.principal, 0), 0);
+  const totalExpected = React.useMemo(() => activeCollectorRows.reduce((s, x) => s + x.expectedToday, 0), [activeCollectorRows]);
+  const totalBalance = React.useMemo(() => activeCollectorRows.reduce((s, x) => s + x.totalOutstanding, 0), [activeCollectorRows]);
+  const totalCapital = React.useMemo(() => activeCollectorRows.reduce((s, x) => s + x.loans.reduce((q, l) => q + l.principal, 0), 0), [activeCollectorRows]);
 
   const filterQ = paymentQuery.trim().toLowerCase();
-  const paymentHistoryRows = db.payments
+  const paymentHistoryRows = React.useMemo(() => db.payments
     .filter(p => (p.loanNo + ' ' + p.borrowerName + ' ' + (p.reference || '') + ' ' + cname(db.collectors.find(c => c.id === p.collectorId))).toLowerCase().includes(filterQ))
     .slice()
-    .reverse();
+    .reverse(), [db.payments, db.collectors, filterQ]);
 
   return (
     <div className="space-y-4">

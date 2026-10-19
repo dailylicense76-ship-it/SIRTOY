@@ -14,17 +14,19 @@ export const LoansPage: React.FC = () => {
 
   const q = search.trim().toLowerCase();
 
-  const rows = db.loans.filter(l => {
-    const b = db.borrowers.find(x => x.id === l.borrowerId);
-    const matchesSearch = (l.loanNo + ' ' + (b ? bname(b) : '') + ' ' + l.loanType).toLowerCase().includes(q);
-    const st = status(l);
-    const matchesStatus = !filterStatus || st === filterStatus;
-    return matchesSearch && matchesStatus;
-  });
+  const rows = React.useMemo(() => {
+    return db.loans.filter(l => {
+      const b = db.borrowers.find(x => x.id === l.borrowerId);
+      const matchesSearch = (l.loanNo + ' ' + (b ? bname(b) : '') + ' ' + l.loanType).toLowerCase().includes(q);
+      const st = status(l);
+      const matchesStatus = !filterStatus || st === filterStatus;
+      return matchesSearch && matchesStatus;
+    });
+  }, [db.loans, db.borrowers, q, filterStatus]);
 
-  const activeLoans = db.loans.filter(loanIsCurrent);
-  const totalPrincipal = db.loans.reduce((s, l) => s + (l.principal || 0), 0);
-  const totalOutstanding = activeLoans.reduce((s, l) => s + outstanding(l), 0);
+  const activeLoans = React.useMemo(() => db.loans.filter(loanIsCurrent), [db.loans]);
+  const totalPrincipal = React.useMemo(() => db.loans.reduce((s, l) => s + (l.principal || 0), 0), [db.loans]);
+  const totalOutstanding = React.useMemo(() => activeLoans.reduce((s, l) => s + outstanding(l), 0), [activeLoans]);
 
   return (
     <div className="space-y-4">

@@ -35,6 +35,20 @@
           }).catch(function() {});
         }
       }
+
+      // Security hardening: Disable F12, inspect shortcut, and right-click to protect proprietary code
+      document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
+      document.addEventListener('keydown', function(e) {
+        var k = (e.key || '').toLowerCase();
+        if (
+          e.key === 'F12' ||
+          (e.ctrlKey && e.shiftKey && (k === 'i' || k === 'j' || k === 'c')) ||
+          (e.ctrlKey && (k === 'u' || k === 's'))
+        ) {
+          e.preventDefault();
+          return false;
+        }
+      });
     </script>
     <link rel="manifest" href="manifest.json" />
   </head>

@@ -1,12 +1,15 @@
-const { app, BrowserWindow, dialog, ipcMain } = require('electron');
+const { app, BrowserWindow, dialog, ipcMain, Menu } = require('electron');
 const path = require('path');
+
+// Completely disable top application menu bar (File, Edit, View, Window, Help)
+Menu.setApplicationMenu(null);
 
 let mainWindow;
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 1366,
-    height: 860,
+    width: 1440,
+    height: 900,
     minWidth: 1024,
     minHeight: 700,
     title: 'Loan Management System — Offline Desktop Edition',
@@ -15,11 +18,15 @@ function createWindow() {
       nodeIntegration: false,
       contextIsolation: true,
       webSecurity: true,
+      devTools: false // Completely disabled to protect application source code
     },
-    autoHideMenuBar: false,
+    autoHideMenuBar: true,
     backgroundColor: '#0f172a',
     show: false,
   });
+
+  // Explicitly remove menu visibility
+  mainWindow.setMenuBarVisibility(false);
 
   // Load the compiled Vite single-page application
   const indexPath = path.join(__dirname, 'dist', 'index.html');
@@ -36,11 +43,21 @@ function createWindow() {
     console.error('Load failed:', errorCode, errorDescription, validatedURL);
   });
 
-  // Allow F12 or Ctrl+Shift+I for DevTools inspection
+  // Strictly block F12, DevTools, View Source, and Inspect shortcuts
   mainWindow.webContents.on('before-input-event', (event, input) => {
-    if (input.key === 'F12' || (input.control && input.shift && input.key.toLowerCase() === 'i')) {
-      mainWindow.webContents.toggleDevTools();
+    const key = (input.key || '').toLowerCase();
+    if (
+      input.key === 'F12' ||
+      (input.control && input.shift && (key === 'i' || key === 'j' || key === 'c')) ||
+      (input.control && (key === 'u' || key === 'r'))
+    ) {
+      event.preventDefault();
     }
+  });
+
+  // Block right-click context menu (prevents Inspect Element menu)
+  mainWindow.webContents.on('context-menu', (e) => {
+    e.preventDefault();
   });
 
   mainWindow.once('ready-to-show', () => {
