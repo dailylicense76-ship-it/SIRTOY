@@ -27,7 +27,7 @@ jobs:
         run: npm run build
 
       - name: Install Electron & Electron Builder
-        run: npm install --save-dev electron@latest electron-builder@latest --legacy-peer-deps
+        run: npm install --save-dev electron@latest electron-builder@latest electron-updater@latest --legacy-peer-deps
 
       - name: Build Windows .EXE (Setup & Portable)
         run: npx electron-builder --win --config electron-builder.json --publish never
@@ -38,14 +38,20 @@ jobs:
       - name: Upload .EXE Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: Sirtoy-Lending-Plus-Windows-EXE
-          path: release/*.exe
+          name: Loan-Management-System-Windows-EXE
+          path: |
+            release/*.exe
+            release/*.blockmap
+            release/latest.yml
           retention-days: 30
 
-      - name: Create GitHub Release (Optional for Tags)
+      - name: Create GitHub Release (For Tags)
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
-          files: release/*.exe
+          files: |
+            release/*.exe
+            release/*.blockmap
+            release/latest.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

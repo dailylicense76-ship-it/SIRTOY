@@ -1,4 +1,4 @@
-const { app, BrowserWindow, dialog } = require('electron');
+const { app, BrowserWindow, dialog, ipcMain } = require('electron');
 const path = require('path');
 
 let mainWindow;
@@ -48,7 +48,7 @@ function createWindow() {
     mainWindow.show();
 
     // Check for updates automatically in background if connected to internet
-    checkForAutoUpdates();
+    checkForAutoUpdates(false);
   });
 
   mainWindow.on('closed', () => {
@@ -56,18 +56,56 @@ function createWindow() {
   });
 }
 
-function checkForAutoUpdates() {
+function checkForAutoUpdates(manual = false) {
   try {
     const { autoUpdater } = require('electron-updater');
     autoUpdater.autoDownload = true;
     autoUpdater.autoInstallOnAppQuit = true;
+
+    autoUpdater.removeAllListeners();
+
+    autoUpdater.on('update-available', (info) => {
+      console.log('Update available:', info.version);
+      if (manual && mainWindow) {
+        dialog.showMessageBox(mainWindow, {
+          type: 'info',
+          title: 'May Bagong Update!',
+          message: `May nakitang bagong bersyon (${info.version}).`,
+          detail: 'Sisimulan na ang pag-download sa background...',
+          buttons: ['OK']
+        });
+      }
+    });
+
+    autoUpdater.on('update-not-available', () => {
+      if (manual && mainWindow) {
+        dialog.showMessageBox(mainWindow, {
+          type: 'info',
+          title: 'Pinakabagong Bersyon',
+          message: 'Nasa pinakabagong bersyon ka na ng Loan Management System.',
+          buttons: ['OK']
+        });
+      }
+    });
+
+    autoUpdater.on('error', (err) => {
+      console.warn('AutoUpdater notice:', err && err.message ? err.message : err);
+      if (manual && mainWindow) {
+        dialog.showMessageBox(mainWindow, {
+          type: 'warning',
+          title: 'Update Check',
+          message: 'Hindi ma-check ang update sa ngayon. Pakisuri ang iyong koneksyon sa internet.',
+          buttons: ['OK']
+        });
+      }
+    });
 
     autoUpdater.on('update-downloaded', (info) => {
       dialog.showMessageBox(mainWindow, {
         type: 'info',
         title: 'May Bagong Update!',
         message: `May bagong bersyon (${info.version}) ng Loan Management System na na-download na.`,
-        detail: 'I-restart ang application ngayon para magamit ang pinakabagong update.',
+        detail: 'I-restart ang application ngayon para magamit ang pinakabagong update. Walang mabuburang data o records.',
         buttons: ['I-restart Ngayon', 'Mamaya'],
         defaultId: 0,
         cancelId: 1
@@ -79,13 +117,16 @@ function checkForAutoUpdates() {
     });
 
     // Silently check without showing errors if offline
-    autoUpdater.checkForUpdatesAndNotify().catch(() => {
-      // Offline or release not reachable - gracefully ignore
-    });
-  } catch (err) {
+    autoUpdater.checkForUpdates().catch(() => {});
+  } catch {
     // electron-updater optional in dev mode
   }
 }
+
+// IPC listener for manual check from Settings or Developer page
+ipcMain.handle('app:check-for-updates', async () => {
+  checkForAutoUpdates(true);
+});
 
 // App lifecycle
 app.whenReady().then(() => {

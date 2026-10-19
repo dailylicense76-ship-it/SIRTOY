@@ -64,7 +64,6 @@ export const LoginPage: React.FC = () => {
     setIsSubmitting(true);
 
     try {
-      await new Promise(resolve => setTimeout(resolve, 300));
       const ok = await login(username, password);
       if (!ok) {
         setError('Invalid username or password. Please verify your credentials.');

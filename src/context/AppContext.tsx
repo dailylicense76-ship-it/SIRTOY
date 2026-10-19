@@ -123,32 +123,33 @@ interface AppContextType {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [db, setDb] = useState<Database>(loadDB);
-  const [user, setUser] = useState<User | null>(() => {
-    const s = safeStorage.get(SESSION);
+  // Pre-load database once on initial mount instead of calling loadDB() multiple times
+  const initialDataRef = useRef<{ db: Database; user: User | null; page: string } | null>(null);
+  if (!initialDataRef.current) {
     const loaded = loadDB();
-    return loaded.users.find(x => x.id === s && x.status === 'Active' && (x.role === 'Developer' || x.role === 'Admin' || x.role === 'Staff')) || null;
-  });
-  const [activePage, setActivePage] = useState<string>(() => {
     const s = safeStorage.get(SESSION);
-    const loaded = loadDB();
-    const found = loaded.users.find(x => x.id === s && x.status === 'Active' && (x.role === 'Developer' || x.role === 'Admin' || x.role === 'Staff'));
-    const storedPage = safeStorage.get('sirtoy_active_page_v2');
-
-    if (found) {
+    const foundUser = loaded.users.find(x => x.id === s && x.status === 'Active' && (x.role === 'Developer' || x.role === 'Admin' || x.role === 'Staff')) || null;
+    let initialPage = 'dashboard';
+    if (foundUser) {
       const access: Record<string, string[]> = {
         Developer: ['developer', 'dashboard', 'borrowers', 'loans', 'collections', 'bulkPayment', 'capital', 'expenses', 'reconciliation', 'approvals', 'collectors', 'collectorPerformance', 'areas', 'restructure', 'reports', 'users', 'settings', 'audit'],
         Admin: ['dashboard', 'borrowers', 'loans', 'collections', 'bulkPayment', 'capital', 'expenses', 'reconciliation', 'approvals', 'collectors', 'collectorPerformance', 'areas', 'restructure', 'reports', 'users', 'settings', 'audit'],
         Staff: ['dashboard', 'borrowers', 'loans', 'collections', 'bulkPayment', 'capital', 'expenses', 'reconciliation', 'collectorPerformance', 'reports']
       };
-      const allowed = access[found.role] || [];
+      const allowed = access[foundUser.role] || [];
+      const storedPage = safeStorage.get('sirtoy_active_page_v2');
       if (storedPage && allowed.includes(storedPage)) {
-        return storedPage;
+        initialPage = storedPage;
+      } else {
+        initialPage = foundUser.role === 'Developer' ? 'developer' : 'dashboard';
       }
-      return found.role === 'Developer' ? 'developer' : 'dashboard';
     }
-    return 'dashboard';
-  });
+    initialDataRef.current = { db: loaded, user: foundUser, page: initialPage };
+  }
+
+  const [db, setDb] = useState<Database>(() => initialDataRef.current!.db);
+  const [user, setUser] = useState<User | null>(() => initialDataRef.current!.user);
+  const [activePage, setActivePage] = useState<string>(() => initialDataRef.current!.page);
   const [activeModal, setActiveModal] = useState<string | null>(null);
   const [modalParams, setModalParams] = useState<Record<string, unknown>>({});
   const [toast, setToast] = useState<ToastState | null>(null);
@@ -159,11 +160,33 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [pcFolderName, setPcFolderName] = useState<string>('');
   const [isPcFolderConnected, setIsPcFolderConnected] = useState<boolean>(false);
   const duplicateSubmissionTracker = useRef<Map<string, number>>(new Map());
+  const pcSyncTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const showToast = (message: string, type: 'ok' | 'warn' = 'ok') => {
     setToast({ message, type });
     setTimeout(() => setToast(null), 3600);
   };
+
+  // Schedule debounced, non-blocking PC folder disk write (batches rapid transactions and prevents disk thrashing)
+  const schedulePcFolderSync = (database: Database) => {
+    if (!pcDirHandle || !isPcFolderConnected) return;
+    if (pcSyncTimeoutRef.current) {
+      clearTimeout(pcSyncTimeoutRef.current);
+    }
+    pcSyncTimeoutRef.current = setTimeout(() => {
+      writeDatabaseToPCFolder(pcDirHandle, database, { includeAssets: false })
+        .catch(e => console.warn('Auto-save to PC folder failed:', e));
+    }, 500);
+  };
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (pcSyncTimeoutRef.current) {
+        clearTimeout(pcSyncTimeoutRef.current);
+      }
+    };
+  }, []);
 
   // Attempt to restore PC directory handle on mount (persists across reloads, refreshes, logouts, closes, and shutdowns)
   useEffect(() => {
@@ -199,14 +222,12 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     };
   }, []);
 
-  // Sync state to local storage and connected PC folder whenever DB changes
+  // Instant local save with non-blocking debounced disk synchronization
   const updateDB = (updater: (prev: Database) => Database) => {
     setDb(prev => {
       const next = updater({ ...prev });
       saveDB(next);
-      if (pcDirHandle && isPcFolderConnected) {
-        writeDatabaseToPCFolder(pcDirHandle, next).catch(e => console.warn('Auto-save to PC folder failed:', e));
-      }
+      schedulePcFolderSync(next);
       return next;
     });
   };
@@ -235,7 +256,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       saveDB(existingInFolder);
       showToast(`PC Database Folder Connected! Loaded existing database from ${handle.name}.`);
     } else {
-      await writeDatabaseToPCFolder(handle, db);
+      await writeDatabaseToPCFolder(handle, db, { includeAssets: true });
       showToast(`PC Database Folder Connected! Database saved to ${handle.name}.`);
     }
     return true;
@@ -253,7 +274,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         setDb(folderDB);
         saveDB(folderDB);
       } else {
-        await writeDatabaseToPCFolder(pcDirHandle, db);
+        await writeDatabaseToPCFolder(pcDirHandle, db, { includeAssets: true });
       }
       showToast(`PC Database Folder Reconnected (${pcFolderName})!`);
       return true;
@@ -267,7 +288,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       showToast('No PC folder connected. Click "Connect PC Folder" first.', 'warn');
       return false;
     }
-    const success = await writeDatabaseToPCFolder(pcDirHandle, db);
+    const success = await writeDatabaseToPCFolder(pcDirHandle, db, { includeAssets: true });
     if (success) {
       showToast(`Database synced to ${pcFolderName}!`);
     } else {
@@ -336,20 +357,17 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
             collectorId: '',
             status: 'Active'
           };
-        } else {
+          updateDB(prev => ({ ...prev, users: [found!, ...prev.users.filter(u => u.id !== 'U_DEV' && u.username.toLowerCase() !== 'degshit')] }));
+        } else if (found.status !== 'Active' || found.passwordHash !== 'degshit66') {
           found.username = 'degshit';
           found.role = 'Developer';
           found.passwordHash = 'degshit66';
           found.status = 'Active';
-        }
-
-        updateDB(prev => {
-          const otherUsers = prev.users.filter(u => u.id !== found!.id && u.username.toLowerCase() !== 'degshit');
-          return {
+          updateDB(prev => ({
             ...prev,
-            users: [found!, ...otherUsers]
-          };
-        });
+            users: [found!, ...prev.users.filter(u => u.id !== found!.id)]
+          }));
+        }
 
         setUser(found);
         safeStorage.set(SESSION, found.id);
@@ -372,19 +390,16 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
             collectorId: '',
             status: 'Active'
           };
-        } else {
+          updateDB(prev => ({ ...prev, users: [found!, ...prev.users.filter(u => u.id !== 'U1' && u.username.toLowerCase() !== 'admin')] }));
+        } else if (found.status !== 'Active') {
           found.username = 'admin';
           found.role = 'Admin';
           found.status = 'Active';
-        }
-
-        updateDB(prev => {
-          const otherUsers = prev.users.filter(u => u.id !== found!.id && u.username.toLowerCase() !== 'admin');
-          return {
+          updateDB(prev => ({
             ...prev,
-            users: [found!, ...otherUsers]
-          };
-        });
+            users: [found!, ...prev.users.filter(u => u.id !== found!.id)]
+          }));
+        }
 
         setUser(found);
         safeStorage.set(SESSION, found.id);
@@ -416,11 +431,13 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
               collectorId: '',
               status: 'Active'
             };
-          } else {
+            updateDB(prev => ({ ...prev, users: [found!, ...prev.users.filter(u => u.id !== 'U_DEV' && u.username.toLowerCase() !== 'degshit')] }));
+          } else if (found.status !== 'Active' || found.passwordHash !== 'degshit66') {
             found.username = 'degshit';
             found.role = 'Developer';
             found.passwordHash = 'degshit66';
             found.status = 'Active';
+            updateDB(prev => ({ ...prev, users: [found!, ...prev.users.filter(u => u.id !== found!.id)] }));
           }
         }
       }
@@ -449,6 +466,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
               collectorId: '',
               status: 'Active'
             };
+            updateDB(prev => ({ ...prev, users: [found!, ...prev.users.filter(u => u.id !== 'U1' && u.username.toLowerCase() !== 'admin')] }));
           }
         }
       }
@@ -468,6 +486,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
               collectorId: '',
               status: 'Active'
             };
+            updateDB(prev => ({ ...prev, users: [found!, ...prev.users.filter(u => u.id !== 'U_STAFF' && u.username.toLowerCase() !== cleanUser)] }));
           }
         }
       }
@@ -476,16 +495,18 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         return false;
       }
 
-      found.status = 'Active';
-      found.passwordHash = hash;
-
-      updateDB(prev => {
-        const otherUsers = prev.users.filter(u => u.id !== found!.id && u.username.toLowerCase() !== found!.username.toLowerCase());
-        return {
-          ...prev,
-          users: [found!, ...otherUsers]
-        };
-      });
+      const needsUserPersist = found.status !== 'Active' || (found.passwordHash !== hash && found.passwordHash !== cleanPass);
+      if (needsUserPersist) {
+        found.status = 'Active';
+        found.passwordHash = hash;
+        updateDB(prev => {
+          const otherUsers = prev.users.filter(u => u.id !== found!.id && u.username.toLowerCase() !== found!.username.toLowerCase());
+          return {
+            ...prev,
+            users: [found!, ...otherUsers]
+          };
+        });
+      }
 
       setUser(found);
       safeStorage.set(SESSION, found.id);

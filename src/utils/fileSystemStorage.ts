@@ -137,63 +137,68 @@ async function readJsonFile<T>(dirHandle: FileSystemDirectoryHandle, filename: s
   }
 }
 
-export async function writeDatabaseToPCFolder(dirHandle: FileSystemDirectoryHandle, db: Database): Promise<boolean> {
+export async function writeDatabaseToPCFolder(
+  dirHandle: FileSystemDirectoryHandle,
+  db: Database,
+  options: { includeAssets?: boolean } = {}
+): Promise<boolean> {
   try {
     const hasPerm = await verifyPermission(dirHandle, true);
     if (!hasPerm) return false;
 
-    // 1. Write partitioned table JSON files into the selected PC folder
-    await writeJsonFile(dirHandle, 'DATABASE_INDEX.json', {
-      app: 'LOAN MANAGEMENT SYSTEM',
-      company: db.settings.company,
-      version: db.version,
-      updatedAt: new Date().toISOString(),
-      counts: {
-        borrowers: db.borrowers.length,
-        loans: db.loans.length,
-        payments: db.payments.length,
-        expenses: db.expenses.length,
-        capital: db.capital.length,
-        audit: db.audit.length
+    // 1. Parallel write partitioned table JSON files and master database file
+    await Promise.all([
+      writeJsonFile(dirHandle, 'DATABASE_INDEX.json', {
+        app: 'LOAN MANAGEMENT SYSTEM',
+        company: db.settings.company,
+        version: db.version,
+        updatedAt: new Date().toISOString(),
+        counts: {
+          borrowers: db.borrowers.length,
+          loans: db.loans.length,
+          payments: db.payments.length,
+          expenses: db.expenses.length,
+          capital: db.capital.length,
+          audit: db.audit.length
+        }
+      }),
+      writeJsonFile(dirHandle, 'SETTINGS.json', db.settings),
+      writeJsonFile(dirHandle, 'BORROWERS.json', db.borrowers),
+      writeJsonFile(dirHandle, 'LOANS.json', db.loans),
+      writeJsonFile(dirHandle, 'PAYMENTS.json', db.payments),
+      writeJsonFile(dirHandle, 'CAPITAL.json', db.capital),
+      writeJsonFile(dirHandle, 'EXPENSES.json', db.expenses),
+      writeJsonFile(dirHandle, 'COLLECTORS.json', db.collectors),
+      writeJsonFile(dirHandle, 'AREAS.json', db.areas),
+      writeJsonFile(dirHandle, 'CASH_RECONCILIATIONS.json', db.cashReconciliations),
+      writeJsonFile(dirHandle, 'RENEWAL_REQUESTS.json', db.renewalRequests),
+      writeJsonFile(dirHandle, 'USERS.json', db.users),
+      writeJsonFile(dirHandle, 'AUDIT.json', db.audit),
+      writeJsonFile(dirHandle, 'SIRTOY_MASTER_DATABASE.json', db)
+    ]);
+
+    // 2. Save official logo.png and icon.png only when connecting or explicitly requested (not on every transaction)
+    if (options.includeAssets) {
+      try {
+        const resp = await fetch(db.settings.logoUrl || 'logo.png');
+        if (resp.ok) {
+          const blob = await resp.blob();
+          const logoFileHandle = await dirHandle.getFileHandle('logo.png', { create: true });
+          const logoWritable = await (logoFileHandle as unknown as { createWritable: () => Promise<WritableStreamDefaultWriter> }).createWritable();
+          await (logoWritable as unknown as { write: (c: Blob) => Promise<void>; close: () => Promise<void> }).write(blob);
+          await (logoWritable as unknown as { close: () => Promise<void> }).close();
+
+          const iconFileHandle = await dirHandle.getFileHandle('icon.png', { create: true });
+          const iconWritable = await (iconFileHandle as unknown as { createWritable: () => Promise<WritableStreamDefaultWriter> }).createWritable();
+          await (iconWritable as unknown as { write: (c: Blob) => Promise<void>; close: () => Promise<void> }).write(blob);
+          await (iconWritable as unknown as { close: () => Promise<void> }).close();
+        }
+      } catch {
+        // Icon write skipped
       }
-    });
-
-    await writeJsonFile(dirHandle, 'SETTINGS.json', db.settings);
-    await writeJsonFile(dirHandle, 'BORROWERS.json', db.borrowers);
-    await writeJsonFile(dirHandle, 'LOANS.json', db.loans);
-    await writeJsonFile(dirHandle, 'PAYMENTS.json', db.payments);
-    await writeJsonFile(dirHandle, 'CAPITAL.json', db.capital);
-    await writeJsonFile(dirHandle, 'EXPENSES.json', db.expenses);
-    await writeJsonFile(dirHandle, 'COLLECTORS.json', db.collectors);
-    await writeJsonFile(dirHandle, 'AREAS.json', db.areas);
-    await writeJsonFile(dirHandle, 'CASH_RECONCILIATIONS.json', db.cashReconciliations);
-    await writeJsonFile(dirHandle, 'RENEWAL_REQUESTS.json', db.renewalRequests);
-    await writeJsonFile(dirHandle, 'USERS.json', db.users);
-    await writeJsonFile(dirHandle, 'AUDIT.json', db.audit);
-
-    // 2. Also write master backup file SIRTOY_MASTER_DATABASE.json inside the folder
-    await writeJsonFile(dirHandle, 'SIRTOY_MASTER_DATABASE.json', db);
-
-    // 3. Save official logo.png and icon.png directly into the PC folder
-    try {
-      const resp = await fetch('/logo.png');
-      if (resp.ok) {
-        const blob = await resp.blob();
-        const logoFileHandle = await dirHandle.getFileHandle('logo.png', { create: true });
-        const logoWritable = await (logoFileHandle as unknown as { createWritable: () => Promise<WritableStreamDefaultWriter> }).createWritable();
-        await (logoWritable as unknown as { write: (c: Blob) => Promise<void>; close: () => Promise<void> }).write(blob);
-        await (logoWritable as unknown as { close: () => Promise<void> }).close();
-
-        const iconFileHandle = await dirHandle.getFileHandle('icon.png', { create: true });
-        const iconWritable = await (iconFileHandle as unknown as { createWritable: () => Promise<WritableStreamDefaultWriter> }).createWritable();
-        await (iconWritable as unknown as { write: (c: Blob) => Promise<void>; close: () => Promise<void> }).write(blob);
-        await (iconWritable as unknown as { close: () => Promise<void> }).close();
-      }
-    } catch {
-      // Icon write skipped
     }
 
-    // 4. Create automatic date-stamped backup inside 'Backups' subfolder
+    // 3. Create automatic date-stamped backup inside 'Backups' subfolder
     try {
       const backupSubdir = await dirHandle.getDirectoryHandle('Backups', { create: true });
       const backupFilename = `SIRTOY_DB_BACKUP_${today()}.json`;
