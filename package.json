@@ -3,7 +3,7 @@
   "description": "LOAN MANAGEMENT SYSTEM - Offline Desktop Lending Management System",
   "author": "Loan Management System",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.0.1",
   "type": "module",
   "scripts": {
     "dev": "tsx server.ts",
